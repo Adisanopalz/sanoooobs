@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Emoji Stream Overlay untuk OBS</title>
-    <!-- Tailwind untuk styling layout sederhana -->
+    <title>Stream Overlay (Transparan)</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Tone.js untuk efek suara procedural -->
+    <!-- Tone.js untuk SFX -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
-    <!-- Font Poppins untuk UI yang lebih modern -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
         body {
@@ -18,405 +18,382 @@
             width: 100vw;
             height: 100vh;
             overflow: hidden;
-            background-color: transparent; /* Default untuk OBS */
-            font-family: 'Poppins', sans-serif;
-            transition: background-color 0.5s ease;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: transparent; /* AUTO TRANSPARANT UNTUK OBS */
+            transition: background 0.4s ease;
         }
 
-        /* Mode Test untuk melihat di browser biasa */
-        body.test-mode {
+        /* Mode Testing (Hanya untuk preview di browser) */
+        body.preview-mode {
             background-color: #0f172a;
             background-image: 
-                radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
-                radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
-                radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
+                radial-gradient(circle at 15% 50%, rgba(79, 70, 229, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 85% 30%, rgba(236, 72, 153, 0.15) 0%, transparent 50%);
         }
 
-        /* Mode Layar Hijau (Chroma Key OBS) */
-        body.green-screen {
-            background-color: #00FF00;
-            background-image: none;
-        }
-
-        /* Glassmorphism UI */
         .glass-panel {
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255,255,255,0.1);
         }
 
-        /* Switch Toggle Custom */
-        .toggle-checkbox:checked {
-            right: 0;
-            border-color: #10B981;
-        }
-        .toggle-checkbox:checked + .toggle-label {
-            background-color: #10B981;
+        .hide-panel {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.9) translateY(20px);
         }
 
-        /* Styling Partikel Emoji */
-        .emoji-particle {
+        .particle {
             position: absolute;
-            bottom: -80px;
+            bottom: -100px;
             pointer-events: none;
             z-index: 50;
-            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3));
-            animation-name: floatUp;
+            will-change: transform, opacity;
+            filter: drop-shadow(0 8px 12px rgba(0,0,0,0.2));
             animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
             animation-fill-mode: forwards;
         }
 
-        @keyframes floatUp {
-            0% { transform: translateY(0) scale(0.5) rotate(0deg); opacity: 0; }
-            10% { opacity: 1; transform: translateY(-5vh) scale(1.2) rotate(-10deg); }
-            80% { opacity: 1; transform: translateY(-80vh) scale(1) rotate(15deg); }
-            100% { transform: translateY(-110vh) scale(0.8) rotate(30deg); opacity: 0; }
-        }
-        
-        @keyframes swayLeft {
-            0%, 100% { margin-left: 0; }
-            50% { margin-left: -50px; }
-        }
-        @keyframes swayRight {
-            0%, 100% { margin-left: 0; }
-            50% { margin-left: 50px; }
+        .mega-particle {
+            filter: drop-shadow(0 0 25px rgba(255, 255, 255, 0.5));
+            z-index: 60;
         }
 
-        .sway-1 { animation: floatUp var(--duration) forwards, swayLeft 3s ease-in-out infinite; }
-        .sway-2 { animation: floatUp var(--duration) forwards, swayRight 4s ease-in-out infinite; }
-        .sway-3 { animation: floatUp var(--duration) forwards, swayLeft 2.5s ease-in-out infinite reverse; }
-
-        .mega-emoji {
-            font-size: 6rem !important;
-            z-index: 100;
-            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.4));
+        /* Variasi Animasi Random */
+        @keyframes floatLeft {
+            0% { transform: translate(0, 0) scale(0.3) rotate(0deg); opacity: 0; }
+            15% { opacity: 1; transform: translate(-10px, -15vh) scale(1.2) rotate(-15deg); }
+            85% { opacity: 1; transform: translate(-40px, -85vh) scale(1) rotate(10deg); }
+            100% { transform: translate(-60px, -110vh) scale(0.8) rotate(25deg); opacity: 0; }
         }
 
-        /* Transisi untuk menyembunyikan panel */
-        .fade-out {
-            opacity: 0;
-            pointer-events: none;
-            transform: scale(0.95);
+        @keyframes floatRight {
+            0% { transform: translate(0, 0) scale(0.3) rotate(0deg); opacity: 0; }
+            15% { opacity: 1; transform: translate(10px, -15vh) scale(1.2) rotate(15deg); }
+            85% { opacity: 1; transform: translate(40px, -85vh) scale(1) rotate(-10deg); }
+            100% { transform: translate(60px, -110vh) scale(0.8) rotate(-25deg); opacity: 0; }
         }
+
+        @keyframes floatStraight {
+            0% { transform: translateY(0) scale(0.3); opacity: 0; }
+            15% { opacity: 1; transform: translateY(-15vh) scale(1.1); }
+            85% { opacity: 1; transform: translateY(-85vh) scale(1); }
+            100% { transform: translateY(-110vh) scale(0.7); opacity: 0; }
+        }
+
+        @keyframes floatZigZag {
+            0% { transform: translate(0, 0) scale(0.5) rotate(0deg); opacity: 0; }
+            20% { opacity: 1; transform: translate(30px, -20vh) scale(1.3) rotate(20deg); }
+            40% { opacity: 1; transform: translate(-30px, -40vh) scale(1) rotate(-20deg); }
+            60% { opacity: 1; transform: translate(30px, -60vh) scale(1.1) rotate(20deg); }
+            80% { opacity: 1; transform: translate(-20px, -80vh) scale(0.9) rotate(-10deg); }
+            100% { transform: translate(0, -110vh) scale(0.7) rotate(0deg); opacity: 0; }
+        }
+
+        .anim-1 { animation-name: floatLeft; }
+        .anim-2 { animation-name: floatRight; }
+        .anim-3 { animation-name: floatStraight; }
+        .anim-4 { animation-name: floatZigZag; }
+
     </style>
 </head>
-<body ondblclick="showPanel()"> <!-- Double click dimana saja untuk memunculkan panel -->
+<body ondblclick="toggleDashboard()">
 
-    <!-- Container Utama Emoji -->
-    <div id="canvas-container" class="absolute inset-0 w-full h-full pointer-events-none"></div>
+    <!-- Layer Kanvas Animasi -->
+    <div id="canvas-layer" class="absolute inset-0 w-full h-full pointer-events-none"></div>
 
-    <!-- UI Dashboard Kontrol (Hanya untuk Streamer) -->
-    <div id="control-panel" class="absolute inset-0 flex items-center justify-center z-[999] transition-all duration-500 ease-in-out">
-        <div class="glass-panel w-[90%] max-w-sm rounded-3xl p-6 text-white relative overflow-hidden">
+    <!-- UI Dashboard Kontrol -->
+    <div id="dashboard" class="absolute inset-0 flex items-center justify-center z-[999] transition-all duration-500 ease-out">
+        <div class="glass-panel w-[90%] max-w-[340px] rounded-3xl p-6 text-white relative overflow-hidden">
             
-            <!-- Dekorasi background -->
-            <div class="absolute -top-10 -right-10 w-32 h-32 bg-pink-500/20 rounded-full blur-3xl"></div>
-            <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-blue-500/20 rounded-full blur-3xl"></div>
+            <!-- Ornamen Dekoratif UI -->
+            <div class="absolute -top-16 -right-16 w-40 h-40 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -bottom-16 -left-16 w-40 h-40 bg-pink-500/20 rounded-full blur-3xl pointer-events-none"></div>
 
-            <!-- Header -->
+            <!-- Header Dashboard -->
             <div class="text-center mb-6 relative z-10">
-                <h2 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-pink-400 to-indigo-400">
-                    Overlay Interaktif
+                <h2 class="text-2xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 tracking-tight">
+                    Overlay Control
                 </h2>
-                <p class="text-xs text-gray-400 mt-1">Setup Dashboard untuk OBS</p>
+                <p class="text-[11px] text-gray-400 mt-1 font-medium tracking-wide">DOUBLE-CLICK LAYAR UNTUK MUNCUL/HILANG</p>
             </div>
 
-            <div class="space-y-5 relative z-10">
-                <!-- Status Audio -->
-                <div class="bg-white/5 rounded-2xl p-4 border border-white/5 flex items-center justify-between">
+            <div class="space-y-4 relative z-10">
+                
+                <!-- Audio Init Card -->
+                <div class="bg-white/5 rounded-2xl p-4 border border-white/10 flex items-center justify-between shadow-lg">
                     <div>
-                        <p class="text-sm font-semibold">Status Audio</p>
-                        <p id="audio-status-text" class="text-xs text-red-400 flex items-center gap-1 mt-1">
+                        <p class="text-sm font-bold text-gray-100">Audio System</p>
+                        <p id="audio-status" class="text-xs text-red-400 flex items-center gap-1.5 mt-0.5 font-medium">
                             <span class="relative flex h-2 w-2">
                               <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                               <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
                             </span>
-                            Belum Aktif
+                            Offline
                         </p>
                     </div>
-                    <button id="btn-audio" onclick="initAudio()" class="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 px-4 py-2 rounded-xl text-sm font-semibold shadow-lg shadow-purple-500/30 transition-all active:scale-95">
+                    <button id="btn-audio" onclick="initializeAudio()" class="bg-white text-gray-900 hover:bg-gray-100 px-4 py-2 rounded-xl text-xs font-bold shadow-lg transition-transform active:scale-95">
                         Aktifkan
                     </button>
                 </div>
 
-                <!-- Fitur Toggles -->
-                <div class="bg-white/5 rounded-2xl p-4 border border-white/5">
-                    <p class="text-sm font-semibold mb-3 border-b border-white/10 pb-2">Fitur & Pengaturan</p>
-                    <div class="space-y-4">
-                        
-                        <!-- Auto-Spam -->
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-xs font-medium">🤖 Auto-Spam Emoji</p>
-                                <p class="text-[9px] text-gray-400 mt-0.5">Emoji muncul sendiri</p>
-                            </div>
-                            <div class="relative inline-block w-10 mr-2 align-middle select-none">
-                                <input type="checkbox" id="toggle-auto" onchange="toggleSetting('auto')" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 border-gray-600 appearance-none cursor-pointer transition-all duration-300 z-10 top-0 left-0" checked/>
-                                <label for="toggle-auto" class="toggle-label block overflow-hidden h-5 rounded-full bg-gray-600 cursor-pointer transition-all duration-300"></label>
-                            </div>
+                <!-- Settings Group -->
+                <div class="bg-white/5 rounded-2xl p-4 border border-white/10 shadow-lg space-y-4">
+                    
+                    <!-- Preview Mode -->
+                    <label class="flex items-center justify-between cursor-pointer group">
+                        <div>
+                            <p class="text-sm font-bold text-gray-100 group-hover:text-white transition-colors">Preview Mode</p>
+                            <p class="text-[10px] text-gray-400">Latar gelap untuk testing</p>
                         </div>
-
-                        <!-- SFX Mute -->
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-xs font-medium">🔊 Suara (SFX)</p>
-                                <p class="text-[9px] text-gray-400 mt-0.5">Bunyi pop & sparkle</p>
-                            </div>
-                            <div class="relative inline-block w-10 mr-2 align-middle select-none">
-                                <input type="checkbox" id="toggle-sfx" onchange="toggleSetting('sfx')" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 border-gray-600 appearance-none cursor-pointer transition-all duration-300 z-10 top-0 left-0" checked/>
-                                <label for="toggle-sfx" class="toggle-label block overflow-hidden h-5 rounded-full bg-gray-600 cursor-pointer transition-all duration-300"></label>
-                            </div>
+                        <div class="relative inline-flex items-center">
+                            <input type="checkbox" id="toggle-preview" class="sr-only peer" checked onchange="updateConfig('preview', this.checked)">
+                            <div class="w-11 h-6 bg-gray-700/50 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-500 border border-white/10"></div>
                         </div>
+                    </label>
 
-                        <!-- Hujan Badai / Insane Mode -->
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-xs font-medium text-pink-400">🔥 Mode Badai</p>
-                                <p class="text-[9px] text-gray-400 mt-0.5">Spawn emoji 3x lipat lebih brutal</p>
-                            </div>
-                            <div class="relative inline-block w-10 mr-2 align-middle select-none">
-                                <input type="checkbox" id="toggle-insane" onchange="toggleSetting('insane')" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 border-gray-600 appearance-none cursor-pointer transition-all duration-300 z-10 top-0 left-0"/>
-                                <label for="toggle-insane" class="toggle-label block overflow-hidden h-5 rounded-full bg-gray-600 cursor-pointer transition-all duration-300"></label>
-                            </div>
+                    <div class="h-px w-full bg-white/5"></div>
+
+                    <!-- Auto Spam -->
+                    <label class="flex items-center justify-between cursor-pointer group">
+                        <div>
+                            <p class="text-sm font-bold text-gray-100 group-hover:text-white transition-colors">Auto-Spawn</p>
+                            <p class="text-[10px] text-gray-400">Munculkan emoji otomatis</p>
                         </div>
-
-                        <!-- Green Screen -->
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-xs font-medium">🟩 Green Screen</p>
-                                <p class="text-[9px] text-gray-400 mt-0.5">Alternatif background OBS</p>
-                            </div>
-                            <div class="relative inline-block w-10 mr-2 align-middle select-none">
-                                <input type="checkbox" id="toggle-green" onchange="toggleSetting('green')" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 border-gray-600 appearance-none cursor-pointer transition-all duration-300 z-10 top-0 left-0"/>
-                                <label for="toggle-green" class="toggle-label block overflow-hidden h-5 rounded-full bg-gray-600 cursor-pointer transition-all duration-300"></label>
-                            </div>
+                        <div class="relative inline-flex items-center">
+                            <input type="checkbox" id="toggle-auto" class="sr-only peer" checked onchange="updateConfig('autoSpam', this.checked)">
+                            <div class="w-11 h-6 bg-gray-700/50 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-pink-500 border border-white/10"></div>
                         </div>
+                    </label>
 
-                    </div>
+                    <!-- SFX -->
+                    <label class="flex items-center justify-between cursor-pointer group">
+                        <div>
+                            <p class="text-sm font-bold text-gray-100 group-hover:text-white transition-colors">Sound Effects</p>
+                            <p class="text-[10px] text-gray-400">Efek pop & sparkle</p>
+                        </div>
+                        <div class="relative inline-flex items-center">
+                            <input type="checkbox" id="toggle-sfx" class="sr-only peer" checked onchange="updateConfig('sfx', this.checked)">
+                            <div class="w-11 h-6 bg-gray-700/50 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-pink-500 border border-white/10"></div>
+                        </div>
+                    </label>
+
+                    <!-- Insane Mode -->
+                    <label class="flex items-center justify-between cursor-pointer group">
+                        <div>
+                            <p class="text-sm font-bold text-red-400 group-hover:text-red-300 transition-colors">🔥 Mode Badai</p>
+                            <p class="text-[10px] text-gray-400">Spam super brutal</p>
+                        </div>
+                        <div class="relative inline-flex items-center">
+                            <input type="checkbox" id="toggle-insane" class="sr-only peer" onchange="updateConfig('insaneMode', this.checked)">
+                            <div class="w-11 h-6 bg-gray-700/50 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-500 border border-white/10"></div>
+                        </div>
+                    </label>
                 </div>
 
-                <!-- Uji Coba Trigger -->
                 <div>
-                    <p class="text-xs font-semibold text-gray-400 mb-2 px-1 uppercase tracking-wider">Uji Coba Animasi</p>
-                    <div class="grid grid-cols-2 gap-3">
-                        <button onclick="triggerRandomEmoji()" class="bg-white/10 hover:bg-white/20 border border-white/10 py-2.5 rounded-xl text-sm font-medium transition-colors flex justify-center items-center gap-2">
-                            <span>🎲</span> Random
+                    <div class="grid grid-cols-2 gap-2 mt-4">
+                        <button onclick="triggerSingle()" class="bg-white/5 hover:bg-white/15 border border-white/10 py-3 rounded-xl text-xs font-bold transition-colors shadow-sm">
+                            🎲 Test 1x
                         </button>
-                        <button onclick="spawnEmojiBurst(20)" class="bg-pink-500/20 hover:bg-pink-500/30 border border-pink-500/30 text-pink-300 py-2.5 rounded-xl text-sm font-medium transition-colors flex justify-center items-center gap-2">
-                            <span>🎁</span> Mega Burst
+                        <button onclick="triggerBurst(20)" class="bg-pink-500/20 hover:bg-pink-500/40 border border-pink-500/30 text-pink-200 py-3 rounded-xl text-xs font-bold transition-colors shadow-sm">
+                            🎁 Mega Burst
                         </button>
                     </div>
                 </div>
 
-                <!-- Tombol Sembunyikan (Live Mode) -->
-                <div class="pt-2">
-                    <button onclick="hidePanel()" class="w-full bg-white text-gray-900 hover:bg-gray-200 py-3 rounded-xl font-bold shadow-[0_0_20px_rgba(255,255,255,0.2)] transition-all active:scale-95 flex justify-center items-center gap-2">
-                        <span>👁️‍🗨️</span> Masuk Mode OBS (Sembunyikan)
-                    </button>
-                    <p class="text-[10px] text-center text-gray-400 mt-3 font-medium">
-                        Tips: <i>Double-click</i> layar untuk memunculkan panel ini lagi.
-                    </p>
-                </div>
+                <button onclick="toggleDashboard()" class="w-full mt-2 py-3 text-xs font-bold text-gray-400 hover:text-white transition-colors border border-transparent hover:border-white/10 rounded-xl">
+                    Sembunyikan Panel
+                </button>
+
             </div>
         </div>
     </div>
 
     <script>
-        // --- KONFIGURASI STATE TOGGLES ---
-        let autoSimEnabled = true;
-        let sfxEnabled = true;
-        let insaneMode = false;
+        // --- STATE & CONFIGURATION ---
+        const config = {
+            preview: true,
+            autoSpam: true,
+            sfx: true,
+            insaneMode: false
+        };
 
-        // --- UI & UX LOGIC ---
-        const controlPanel = document.getElementById('control-panel');
-        const body = document.body;
-        const audioStatusText = document.getElementById('audio-status-text');
-        const btnAudio = document.getElementById('btn-audio');
+        // Kumpulan emoji masif & random
+        const emojis = [
+            '❤️','💖','🔥','😂','💀','😭','🤯','💯','✨','👀',
+            '🎁','💎','👑','🚀','⭐','🎉','💸','💰','🏆','🎯',
+            '🐶','🐱','🐼','🦊','🦋','🦄','🦖','🐙','🐳','🐷',
+            '🍔','🍕','🍟','🍣','🍦','🍩','🍉','🍓','🍻','☕',
+            '😎','🥳','🥺','😡','😱','👽','👾','👻','🤖','🤡',
+            '⚡','🌈','❄️','🔥','💧','🌸','🌺','🍄','🌍','🌙'
+        ];
 
-        function hidePanel() {
-            controlPanel.classList.add('fade-out');
+        const canvas = document.getElementById('canvas-layer');
+        const dashboard = document.getElementById('dashboard');
+        
+        // Loop References
+        let loopInterval1, loopInterval2;
+
+        // --- CORE FUNCTIONS ---
+
+        function toggleDashboard() {
+            dashboard.classList.toggle('hide-panel');
         }
 
-        function showPanel() {
-            controlPanel.classList.remove('fade-out');
-        }
-
-        function toggleSetting(type) {
-            if (type === 'auto') autoSimEnabled = document.getElementById('toggle-auto').checked;
-            if (type === 'sfx') sfxEnabled = document.getElementById('toggle-sfx').checked;
-            if (type === 'insane') insaneMode = document.getElementById('toggle-insane').checked;
+        function updateConfig(key, value) {
+            config[key] = value;
             
-            if (type === 'green') {
-                const isGreen = document.getElementById('toggle-green').checked;
-                if (isGreen) {
-                    body.classList.add('green-screen');
-                    body.classList.remove('test-mode');
-                } else {
-                    body.classList.remove('green-screen');
-                    body.classList.add('test-mode'); // Kembalikan ke tema gelap preview
-                }
+            if (key === 'preview') {
+                document.body.classList.toggle('preview-mode', config.preview);
+            }
+            
+            // Restart loop if timing configs change
+            if (key === 'autoSpam' || key === 'insaneMode') {
+                manageSimulationLoop();
             }
         }
 
-        function updateAudioUI() {
-            audioStatusText.innerHTML = `
-                <span class="relative flex h-2 w-2">
-                  <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500 shadow-[0_0_8px_#10B981]"></span>
-                </span>
-                Aktif & Siap!
-            `;
-            audioStatusText.classList.replace('text-red-400', 'text-green-400');
-            btnAudio.innerText = '✓ Selesai';
-            btnAudio.classList.replace('from-indigo-500', 'from-emerald-500');
-            btnAudio.classList.replace('to-purple-600', 'to-green-600');
-            btnAudio.disabled = true;
-        }
+        // --- AUDIO SYSTEM (Tone.js) ---
+        let audioReady = false;
+        let synthPop, synthSparkle;
 
-        // --- KONFIGURASI EMOJI ---
-        const emojiSets = {
-            likes: ['❤️', '💖', '💗', '💓', '💕'],
-            reactions: ['😂', '🔥', '💀', '😭', '🤯', '💯', '✨', '👀'],
-            gifts: ['🎁', '💎', '👑', '🚀', '⭐', '🎉'],
-            faces: ['😎', '🥳', '🥺', '😡', '😱']
-        };
-        const allEmojis = Object.values(emojiSets).flat();
-
-        // --- SISTEM SUARA DENGAN TONE.JS ---
-        let audioInitialized = false;
-        let popSynth, sparkleSynth;
-
-        async function initAudio() {
-            if (audioInitialized) return;
+        async function initializeAudio() {
+            if (audioReady) return;
             
             await Tone.start();
             
-            popSynth = new Tone.PolySynth(Tone.Synth, {
+            // Synth untuk pop biasa
+            synthPop = new Tone.PolySynth(Tone.Synth, {
                 oscillator: { type: "sine" },
-                envelope: { attack: 0.01, decay: 0.1, sustain: 0, release: 0.1 }
+                envelope: { attack: 0.005, decay: 0.1, sustain: 0, release: 0.1 }
             }).toDestination();
-            popSynth.volume.value = -15;
+            synthPop.volume.value = -12;
 
-            sparkleSynth = new Tone.PolySynth(Tone.Synth, {
+            // Synth untuk efek ledakan (burst)
+            synthSparkle = new Tone.PolySynth(Tone.Synth, {
                 oscillator: { type: "triangle" },
-                envelope: { attack: 0.05, decay: 0.3, sustain: 0.1, release: 1 }
+                envelope: { attack: 0.02, decay: 0.3, sustain: 0.1, release: 0.8 }
             }).toDestination();
-            sparkleSynth.volume.value = -10;
+            synthSparkle.volume.value = -8;
 
-            audioInitialized = true;
-            updateAudioUI();
-        }
-
-        function playPopSound() {
-            if (!audioInitialized || !sfxEnabled) return;
-            const notes = ["C5", "E5", "G5", "C6"];
-            const randomNote = notes[Math.floor(Math.random() * notes.length)];
-            popSynth.triggerAttackRelease(randomNote, "32n");
-        }
-
-        function playSparkleSound() {
-            if (!audioInitialized || !sfxEnabled) return;
-            const now = Tone.now();
-            sparkleSynth.triggerAttackRelease("C5", "16n", now);
-            sparkleSynth.triggerAttackRelease("E5", "16n", now + 0.1);
-            sparkleSynth.triggerAttackRelease("G5", "16n", now + 0.2);
-            sparkleSynth.triggerAttackRelease("C6", "8n", now + 0.3);
-        }
-
-        // --- SISTEM PEMBUATAN EMOJI ---
-        const container = document.getElementById('canvas-container');
-
-        function createEmoji(options = {}) {
-            const el = document.createElement('div');
+            audioReady = true;
             
-            const emojiChar = options.char || allEmojis[Math.floor(Math.random() * allEmojis.length)];
-            const size = options.size || (Math.random() * 1.5 + 1.5); 
-            const leftPos = options.left !== undefined ? options.left : (Math.random() * 90 + 5); 
-            const duration = options.duration || (Math.random() * 3 + 3); 
+            // Update UI Button
+            const statusEl = document.getElementById('audio-status');
+            const btnEl = document.getElementById('btn-audio');
             
-            const swayClass = `sway-${Math.floor(Math.random() * 3) + 1}`;
-
-            el.innerText = emojiChar;
-            el.className = `emoji-particle ${swayClass}`;
-            if(options.isMega) el.classList.add('mega-emoji');
-
-            el.style.left = `${leftPos}%`;
-            el.style.fontSize = `${size}rem`;
-            el.style.setProperty('--duration', `${duration}s`);
-            
-            const startRotation = Math.random() * 60 - 30;
-            el.style.transform = `rotate(${startRotation}deg)`;
-
-            container.appendChild(el);
-
-            setTimeout(() => {
-                if (el.parentNode === container) container.removeChild(el);
-            }, duration * 1000);
+            statusEl.innerHTML = `<span class="relative flex h-2 w-2"><span class="relative inline-flex rounded-full h-2 w-2 bg-green-400 shadow-[0_0_10px_#4ade80]"></span></span> Siap`;
+            statusEl.classList.replace('text-red-400', 'text-green-400');
+            btnEl.innerText = '✓ Terhubung';
+            btnEl.classList.replace('bg-white', 'bg-green-500');
+            btnEl.classList.replace('text-gray-900', 'text-white');
+            btnEl.disabled = true;
         }
 
-        // --- FUNGSI TRIGGER UNTUK EVENT ---
-        function triggerRandomEmoji() {
-            // Mengambil dari gabungan semua array emoji (likes, reactions, gifts, faces)
-            const char = allEmojis[Math.floor(Math.random() * allEmojis.length)];
-            createEmoji({ char: char });
-            if(Math.random() > 0.5) playPopSound(); 
-        }
-
-        function spawnEmojiBurst(count = 10, specialChar = null) {
-            playSparkleSound();
+        function playSound(type) {
+            if (!audioReady || !config.sfx) return;
             
-            for (let i = 0; i < count; i++) {
-                setTimeout(() => {
-                    const isMega = (i === Math.floor(count / 2)); 
-                    const leftPos = 20 + Math.random() * 60; 
-                    
-                    let char = specialChar;
-                    if(!char) {
-                        const set = count > 10 ? emojiSets.gifts : emojiSets.reactions;
-                        char = set[Math.floor(Math.random() * set.length)];
-                    }
-
-                    createEmoji({
-                        char: char,
-                        isMega: isMega,
-                        left: leftPos,
-                        duration: Math.random() * 2 + 2.5 
-                    });
-                    
-                    playPopSound();
-                    
-                }, i * 100); 
+            if (type === 'pop') {
+                const notes = ["C5", "D5", "E5", "G5", "A5", "C6"];
+                const randomNote = notes[Math.floor(Math.random() * notes.length)];
+                synthPop.triggerAttackRelease(randomNote, "32n");
+            } else if (type === 'sparkle') {
+                const now = Tone.now();
+                synthSparkle.triggerAttackRelease("C5", "16n", now);
+                synthSparkle.triggerAttackRelease("E5", "16n", now + 0.1);
+                synthSparkle.triggerAttackRelease("G5", "16n", now + 0.2);
+                synthSparkle.triggerAttackRelease("C6", "8n", now + 0.3);
             }
         }
 
-        // --- SIMULASI OTOMATIS (Untuk Preview) ---
-        function startSimulation() {
-            setInterval(() => {
-                if (!autoSimEnabled) return; // Stop jika toggle dimatikan
-                
-                const multiplier = insaneMode ? 4 : 1; // 4x lebih banyak di mode badai
-                const amount = Math.floor(Math.random() * 3 * multiplier);
-                
-                for(let i=0; i<amount; i++) {
-                    setTimeout(triggerRandomEmoji, i * (insaneMode ? 50 : 200));
-                }
-            }, 1000);
+        // --- PARTICLE GENERATOR ---
+        
+        function spawnParticle(isMega = false) {
+            const el = document.createElement('div');
+            
+            // Randomize Data
+            const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+            const animClass = `anim-${Math.floor(Math.random() * 4) + 1}`; // anim-1 to anim-4
+            
+            // Ukuran normal (1.5 - 3rem), Mega (6 - 9rem)
+            const size = isMega ? (Math.random() * 3 + 6) : (Math.random() * 1.5 + 1.5);
+            const leftPos = Math.random() * 90 + 5; // 5% to 95%
+            const duration = isMega ? (Math.random() * 2 + 4) : (Math.random() * 2.5 + 2.5); // 2.5s - 5s
+            
+            // Setup DOM Element
+            el.className = `particle ${animClass}`;
+            if (isMega) el.classList.add('mega-particle');
+            
+            el.innerText = emoji;
+            el.style.left = `${leftPos}%`;
+            el.style.fontSize = `${size}rem`;
+            el.style.animationDuration = `${duration}s`;
+            
+            // Random start rotation
+            const startRot = Math.random() * 60 - 30;
+            el.style.transform = `rotate(${startRot}deg)`;
 
-            setInterval(() => {
-                if (!autoSimEnabled) return;
-                
-                // Jika mode badai, burst lebih sering dan lebih banyak
-                const burstChance = insaneMode ? 0.4 : 0.8;
-                if(Math.random() > burstChance) {
-                    spawnEmojiBurst(insaneMode ? 35 : (Math.floor(Math.random() * 8) + 4));
-                }
-            }, 6000);
+            canvas.appendChild(el);
+
+            // Cleanup memory
+            setTimeout(() => {
+                if (el.parentNode === canvas) el.remove();
+            }, duration * 1000);
         }
 
-        // INIT
-        document.body.classList.add('test-mode');
-        startSimulation();
+        // --- TRIGGERS ---
+
+        function triggerSingle() {
+            spawnParticle();
+            if(Math.random() > 0.3) playSound('pop');
+        }
+
+        function triggerBurst(count = 15) {
+            playSound('sparkle');
+            for (let i = 0; i < count; i++) {
+                setTimeout(() => {
+                    const isMega = (i === Math.floor(count / 2)); // 1 Mega in the middle of burst
+                    spawnParticle(isMega);
+                    if(Math.random() > 0.5) playSound('pop');
+                }, i * 80);
+            }
+        }
+
+        // --- SIMULATION LOOP ---
+        
+        function manageSimulationLoop() {
+            // Clear existing intervals to prevent overlapping bugs
+            clearInterval(loopInterval1);
+            clearInterval(loopInterval2);
+
+            if (!config.autoSpam) return;
+
+            // Loop 1: Spawning reguler
+            const regularSpeed = config.insaneMode ? 200 : 800; // ms
+            loopInterval1 = setInterval(() => {
+                const amount = config.insaneMode ? Math.floor(Math.random() * 4) + 2 : Math.floor(Math.random() * 2);
+                for(let i=0; i<amount; i++) {
+                    setTimeout(triggerSingle, i * 50);
+                }
+            }, regularSpeed);
+
+            // Loop 2: Random Burst sesekali
+            const burstSpeed = config.insaneMode ? 3000 : 8000; // ms
+            loopInterval2 = setInterval(() => {
+                // 40% chance to burst
+                if (Math.random() > 0.6) {
+                    const count = config.insaneMode ? (Math.floor(Math.random() * 20) + 15) : (Math.floor(Math.random() * 8) + 4);
+                    triggerBurst(count);
+                }
+            }, burstSpeed);
+        }
+
+        // --- INITIALIZATION ---
+        document.body.classList.add('preview-mode'); // Set initial test background
+        manageSimulationLoop(); // Start loops
 
     </script>
 </body>
