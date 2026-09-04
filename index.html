@@ -32,6 +32,12 @@
                 radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
         }
 
+        /* Mode Layar Hijau (Chroma Key OBS) */
+        body.green-screen {
+            background-color: #00FF00;
+            background-image: none;
+        }
+
         /* Glassmorphism UI */
         .glass-panel {
             background: rgba(30, 41, 59, 0.7);
@@ -135,15 +141,59 @@
                     </button>
                 </div>
 
-                <!-- Mode Test Toggle -->
-                <div class="bg-white/5 rounded-2xl p-4 border border-white/5 flex items-center justify-between">
-                    <div>
-                        <p class="text-sm font-semibold">Background Mode</p>
-                        <p class="text-[10px] text-gray-400 mt-1">Nyalakan saat di browser, matikan di OBS</p>
-                    </div>
-                    <div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
-                        <input type="checkbox" name="toggle" id="bg-toggle" onchange="toggleBackground()" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 border-gray-600 appearance-none cursor-pointer transition-all duration-300 z-10 top-0 left-0" checked/>
-                        <label for="bg-toggle" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-600 cursor-pointer transition-all duration-300"></label>
+                <!-- Fitur Toggles -->
+                <div class="bg-white/5 rounded-2xl p-4 border border-white/5">
+                    <p class="text-sm font-semibold mb-3 border-b border-white/10 pb-2">Fitur & Pengaturan</p>
+                    <div class="space-y-4">
+                        
+                        <!-- Auto-Spam -->
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-medium">🤖 Auto-Spam Emoji</p>
+                                <p class="text-[9px] text-gray-400 mt-0.5">Emoji muncul sendiri</p>
+                            </div>
+                            <div class="relative inline-block w-10 mr-2 align-middle select-none">
+                                <input type="checkbox" id="toggle-auto" onchange="toggleSetting('auto')" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 border-gray-600 appearance-none cursor-pointer transition-all duration-300 z-10 top-0 left-0" checked/>
+                                <label for="toggle-auto" class="toggle-label block overflow-hidden h-5 rounded-full bg-gray-600 cursor-pointer transition-all duration-300"></label>
+                            </div>
+                        </div>
+
+                        <!-- SFX Mute -->
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-medium">🔊 Suara (SFX)</p>
+                                <p class="text-[9px] text-gray-400 mt-0.5">Bunyi pop & sparkle</p>
+                            </div>
+                            <div class="relative inline-block w-10 mr-2 align-middle select-none">
+                                <input type="checkbox" id="toggle-sfx" onchange="toggleSetting('sfx')" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 border-gray-600 appearance-none cursor-pointer transition-all duration-300 z-10 top-0 left-0" checked/>
+                                <label for="toggle-sfx" class="toggle-label block overflow-hidden h-5 rounded-full bg-gray-600 cursor-pointer transition-all duration-300"></label>
+                            </div>
+                        </div>
+
+                        <!-- Hujan Badai / Insane Mode -->
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-medium text-pink-400">🔥 Mode Badai</p>
+                                <p class="text-[9px] text-gray-400 mt-0.5">Spawn emoji 3x lipat lebih brutal</p>
+                            </div>
+                            <div class="relative inline-block w-10 mr-2 align-middle select-none">
+                                <input type="checkbox" id="toggle-insane" onchange="toggleSetting('insane')" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 border-gray-600 appearance-none cursor-pointer transition-all duration-300 z-10 top-0 left-0"/>
+                                <label for="toggle-insane" class="toggle-label block overflow-hidden h-5 rounded-full bg-gray-600 cursor-pointer transition-all duration-300"></label>
+                            </div>
+                        </div>
+
+                        <!-- Green Screen -->
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-medium">🟩 Green Screen</p>
+                                <p class="text-[9px] text-gray-400 mt-0.5">Alternatif background OBS</p>
+                            </div>
+                            <div class="relative inline-block w-10 mr-2 align-middle select-none">
+                                <input type="checkbox" id="toggle-green" onchange="toggleSetting('green')" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 border-gray-600 appearance-none cursor-pointer transition-all duration-300 z-10 top-0 left-0"/>
+                                <label for="toggle-green" class="toggle-label block overflow-hidden h-5 rounded-full bg-gray-600 cursor-pointer transition-all duration-300"></label>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 
@@ -151,8 +201,8 @@
                 <div>
                     <p class="text-xs font-semibold text-gray-400 mb-2 px-1 uppercase tracking-wider">Uji Coba Animasi</p>
                     <div class="grid grid-cols-2 gap-3">
-                        <button onclick="triggerLike()" class="bg-white/10 hover:bg-white/20 border border-white/10 py-2.5 rounded-xl text-sm font-medium transition-colors flex justify-center items-center gap-2">
-                            <span>❤️</span> Like
+                        <button onclick="triggerRandomEmoji()" class="bg-white/10 hover:bg-white/20 border border-white/10 py-2.5 rounded-xl text-sm font-medium transition-colors flex justify-center items-center gap-2">
+                            <span>🎲</span> Random
                         </button>
                         <button onclick="spawnEmojiBurst(20)" class="bg-pink-500/20 hover:bg-pink-500/30 border border-pink-500/30 text-pink-300 py-2.5 rounded-xl text-sm font-medium transition-colors flex justify-center items-center gap-2">
                             <span>🎁</span> Mega Burst
@@ -174,6 +224,11 @@
     </div>
 
     <script>
+        // --- KONFIGURASI STATE TOGGLES ---
+        let autoSimEnabled = true;
+        let sfxEnabled = true;
+        let insaneMode = false;
+
         // --- UI & UX LOGIC ---
         const controlPanel = document.getElementById('control-panel');
         const body = document.body;
@@ -188,8 +243,21 @@
             controlPanel.classList.remove('fade-out');
         }
 
-        function toggleBackground() {
-            body.classList.toggle('test-mode');
+        function toggleSetting(type) {
+            if (type === 'auto') autoSimEnabled = document.getElementById('toggle-auto').checked;
+            if (type === 'sfx') sfxEnabled = document.getElementById('toggle-sfx').checked;
+            if (type === 'insane') insaneMode = document.getElementById('toggle-insane').checked;
+            
+            if (type === 'green') {
+                const isGreen = document.getElementById('toggle-green').checked;
+                if (isGreen) {
+                    body.classList.add('green-screen');
+                    body.classList.remove('test-mode');
+                } else {
+                    body.classList.remove('green-screen');
+                    body.classList.add('test-mode'); // Kembalikan ke tema gelap preview
+                }
+            }
         }
 
         function updateAudioUI() {
@@ -241,14 +309,14 @@
         }
 
         function playPopSound() {
-            if (!audioInitialized) return;
+            if (!audioInitialized || !sfxEnabled) return;
             const notes = ["C5", "E5", "G5", "C6"];
             const randomNote = notes[Math.floor(Math.random() * notes.length)];
             popSynth.triggerAttackRelease(randomNote, "32n");
         }
 
         function playSparkleSound() {
-            if (!audioInitialized) return;
+            if (!audioInitialized || !sfxEnabled) return;
             const now = Tone.now();
             sparkleSynth.triggerAttackRelease("C5", "16n", now);
             sparkleSynth.triggerAttackRelease("E5", "16n", now + 0.1);
@@ -288,8 +356,9 @@
         }
 
         // --- FUNGSI TRIGGER UNTUK EVENT ---
-        function triggerLike() {
-            const char = emojiSets.likes[Math.floor(Math.random() * emojiSets.likes.length)];
+        function triggerRandomEmoji() {
+            // Mengambil dari gabungan semua array emoji (likes, reactions, gifts, faces)
+            const char = allEmojis[Math.floor(Math.random() * allEmojis.length)];
             createEmoji({ char: char });
             if(Math.random() > 0.5) playPopSound(); 
         }
@@ -324,12 +393,24 @@
         // --- SIMULASI OTOMATIS (Untuk Preview) ---
         function startSimulation() {
             setInterval(() => {
-                const amount = Math.floor(Math.random() * 3);
-                for(let i=0; i<amount; i++) setTimeout(triggerLike, i * 200);
+                if (!autoSimEnabled) return; // Stop jika toggle dimatikan
+                
+                const multiplier = insaneMode ? 4 : 1; // 4x lebih banyak di mode badai
+                const amount = Math.floor(Math.random() * 3 * multiplier);
+                
+                for(let i=0; i<amount; i++) {
+                    setTimeout(triggerRandomEmoji, i * (insaneMode ? 50 : 200));
+                }
             }, 1000);
 
             setInterval(() => {
-                if(Math.random() > 0.8) spawnEmojiBurst(Math.floor(Math.random() * 8) + 4);
+                if (!autoSimEnabled) return;
+                
+                // Jika mode badai, burst lebih sering dan lebih banyak
+                const burstChance = insaneMode ? 0.4 : 0.8;
+                if(Math.random() > burstChance) {
+                    spawnEmojiBurst(insaneMode ? 35 : (Math.floor(Math.random() * 8) + 4));
+                }
             }, 6000);
         }
 
