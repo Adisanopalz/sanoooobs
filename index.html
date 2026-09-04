@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeonCast - Konfigurasi Overlay Stream</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Press+Start+2P&family=Inter:wght@300;400;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        .font-modern { font-family: 'Inter', sans-serif; }
+        .font-pixel { font-family: 'Press Start 2P', monospace; font-size: 0.75rem; }
+        .font-cyber { font-family: 'Orbitron', sans-serif; }
+        .font-tech { font-family: 'Share Tech Mono', monospace; }
+
+        /* Glassmorphism Panel */
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Marquee Animation */
+        @keyframes marquee {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        .animate-marquee {
+            display: inline-block;
+            white-space: nowrap;
+            animation: marquee 15s linear infinite;
+        }
+
+        /* Neon Glows */
+        .neon-glow-pink {
+            box-shadow: 0 0 20px rgba(236, 72, 153, 0.4);
+        }
+        .neon-glow-blue {
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950 text-slate-100 min-h-screen font-modern antialiased selection:bg-pink-500 selection:text-white">
+
+    <!-- Header / Navigasi Utama -->
+    <header class="border-b border-slate-800 bg-slate-950/50 backdrop-blur-md sticky top-0 z-50 px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+            <div class="w-9 h-9 rounded-lg bg-gradient-to-tr from-pink-500 to-blue-500 flex items-center justify-center neon-glow-pink">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                </svg>
+            </div>
+            <h1 class="text-xl font-extrabold tracking-wider bg-gradient-to-r from-pink-400 to-blue-400 bg-clip-text text-transparent font-cyber">NEONCAST</h1>
+        </div>
+        <div class="text-xs text-slate-400 hidden sm:block">Stream Overlay Studio Pro</div>
+    </header>
+
+    <!-- Konten Utama: Desktop Grid 2 Kolom, Mobile Vertikal Stack -->
+    <main class="max-w-[1600px] mx-auto p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <!-- KOLOM KIRI (40% pada LG = col-span-5): Panel Kontrol Tabs -->
+        <section class="lg:col-span-5 glass-panel rounded-2xl p-5 shadow-2xl flex flex-col space-y-6 order-2 lg:order-1">
+            
+            <!-- Navigasi Tab -->
+            <div class="flex rounded-xl bg-slate-900/80 p-1 border border-slate-800 text-sm">
+                <button onclick="switchTab('general')" id="tab-btn-general" class="flex-1 py-2.5 rounded-lg font-medium transition-all text-center bg-gradient-to-r from-pink-500 to-pink-600 text-white shadow-md">General</button>
+                <button onclick="switchTab('widgets')" id="tab-btn-widgets" class="flex-1 py-2.5 rounded-lg font-medium transition-all text-center text-slate-400 hover:text-white">Widgets</button>
+                <button onclick="switchTab('style')" id="tab-btn-style" class="flex-1 py-2.5 rounded-lg font-medium transition-all text-center text-slate-400 hover:text-white">Style</button>
+                <button onclick="switchTab('output')" id="tab-btn-output" class="flex-1 py-2.5 rounded-lg font-medium transition-all text-center text-slate-400 hover:text-white">Output</button>
+            </div>
+
+            <!-- Konten Tab: GENERAL -->
+            <div id="tab-content-general" class="space-y-4 tab-content">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Streamer Name (Watermark)</label>
+                    <input type="text" id="input-streamer" value="CyberStreamer" placeholder="Contoh: AlexGaming" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-pink-500 transition-colors">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">YouTube Username</label>
+                    <input type="text" id="input-yt" value="@CyberChannel" placeholder="@channel" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-pink-500 transition-colors">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Instagram Username</label>
+                    <input type="text" id="input-ig" value="@alex_stream" placeholder="@username" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-pink-500 transition-colors">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">TikTok Username</label>
+                    <input type="text" id="input-tt" value="@alextiktok" placeholder="@username" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-pink-500 transition-colors">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Custom Marquee Text</label>
+                    <input type="text" id="input-marquee" value="⚡ SELAMAT DATANG DI LIVESTREAM! JANGAN LUPA SUBSCRIBE & LIKE! ⚡" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-pink-500 transition-colors">
+                </div>
+            </div>
+
+            <!-- Konten Tab: WIDGETS -->
+            <div id="tab-content-widgets" class="space-y-5 tab-content hidden">
+                <!-- Toggles / Switches -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-slate-900/60 p-3.5 rounded-xl border border-slate-800 flex items-center justify-between">
+                        <span class="text-xs font-medium text-slate-300">Jam Digital</span>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="toggle-clock" checked class="sr-only peer">
+                            <div class="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-pink-500"></div>
+                        </label>
+                    </div>
+                    <div class="bg-slate-900/60 p-3.5 rounded-xl border border-slate-800 flex items-center justify-between">
+                        <span class="text-xs font-medium text-slate-300">Sosmed Rotator</span>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="toggle-social" checked class="sr-only peer">
+                            <div class="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="border-t border-slate-800/80 pt-4 space-y-4">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-pink-400">Widget Now Playing</h3>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Nama Lagu</label>
+                            <input type="text" id="input-song" value="Synthwave Dreams" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-pink-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Nama Artis</label>
+                            <input type="text" id="input-artist" value="Neon Rider" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-pink-500">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="border-t border-slate-800/80 pt-4 space-y-4">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-blue-400">Widget Progress Goal</h3>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Target Judul</label>
+                        <input type="text" id="input-goal-title" value="Upgrade GPU RTX 5090" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-blue-500 mb-3">
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-xs text-slate-400 mb-1">
+                            <span>Persentase Progress</span>
+                            <span id="goal-val-label">75%</span>
+                        </div>
+                        <input type="range" id="input-goal-percent" min="0" max="100" value="75" class="w-full accent-blue-500 cursor-pointer">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Konten Tab: STYLE -->
+            <div id="tab-content-style" class="space-y-4 tab-content hidden">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Font Family</label>
+                    <select id="select-font" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-pink-500 transition-colors">
+                        <option value="font-modern">Modern Sans (Inter)</option>
+                        <option value="font-cyber">Cybertech (Orbitron)</option>
+                        <option value="font-tech">Tech Mono (Share Tech)</option>
+                        <option value="font-pixel">Pixel / Retro (Press Start)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Background FX</label>
+                    <select id="select-bgfx" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-pink-500 transition-colors">
+                        <option value="stardust">Stardust / Partikel</option>
+                        <option value="matrix">Matrix Rain</option>
+                        <option value="neongrid">Neon Grid</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Konten Tab: OUTPUT -->
+            <div id="tab-content-output" class="space-y-4 tab-content hidden">
+                <div>
+                    <p class="text-xs text-slate-400 mb-3">Klik tombol di bawah untuk menghasilkan URL konfigurasi overlay stream unik yang siap dipakai di OBS Studio / Streamlabs.</p>
+                    <button onclick="generateUrl()" class="w-full py-3.5 px-4 rounded-xl font-bold bg-gradient-to-r from-pink-500 to-blue-500 text-white shadow-lg shadow-pink-500/20 hover:opacity-90 active:scale-[0.99] transition-all">
+                        Generate Overlay URL
+                    </button>
+                </div>
+                <div id="output-container" class="hidden space-y-3 pt-2">
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400">Hasil URL Overlay</label>
+                    <div class="flex space-x-2">
+                        <input type="text" id="output-url-box" readonly class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-300 font-mono focus:outline-none">
+                        <button onclick="copyUrl()" id="copy-btn" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-semibold rounded-xl border border-slate-700 transition-colors whitespace-nowrap">
+                            Copy
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- KOLOM KANAN (60% pada LG = col-span-7): Live Preview 16:9 Sticky -->
+        <section class="lg:col-span-7 sticky top-24 order-1 lg:order-2">
+            <div class="glass-panel rounded-2xl p-4 shadow-2xl border border-slate-800">
+                <div class="flex items-center justify-between mb-3 px-2">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center space-x-2">
+                        <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                        <span>Live Preview (16:9)</span>
+                    </span>
+                    <span class="text-[10px] bg-slate-800/80 text-slate-300 px-2.5 py-1 rounded-full border border-slate-700">Real-Time Binding</span>
+                </div>
+
+                <!-- Container 16:9 Absolute Layering -->
+                <div id="preview-container" class="relative w-full aspect-video rounded-xl overflow-hidden border border-slate-700/60 neon-glow-pink">
+                    
+                    <!-- Layer 1: Canvas Background FX -->
+                    <canvas id="preview-canvas" class="absolute inset-0 w-full h-full z-1"></canvas>
+
+                    <!-- Layer 10: Overlay Elemen UI -->
+                    <div id="overlay-wrapper" class="absolute inset-0 z-10 p-5 flex flex-col justify-between font-modern pointer-events-none text-white">
+                        
+                        <!-- Top: Marquee & Header Info -->
+                        <div class="space-y-2">
+                            <!-- Marquee Bar -->
+                            <div class="w-full bg-slate-900/60 backdrop-blur-sm border border-pink-500/30 rounded-lg overflow-hidden py-1 px-3">
+                                <div id="preview-marquee" class="animate-marquee text-xs font-semibold tracking-wide text-pink-300">
+                                    ⚡ SELAMAT DATANG DI LIVESTREAM! JANGAN LUPA SUBSCRIBE & LIKE! ⚡
+                                </div>
+                            </div>
+
+                            <div class="flex justify-between items-start">
+                                <!-- Kiri Atas: Streamer Name -->
+                                <div class="bg-slate-950/70 backdrop-blur-md border border-slate-700/50 px-3.5 py-1.5 rounded-lg flex items-center space-x-2 shadow-lg">
+                                    <div class="w-2 h-2 rounded-full bg-pink-500"></div>
+                                    <span id="preview-streamer" class="text-sm font-bold tracking-wide text-white">CyberStreamer</span>
+                                </div>
+
+                                <!-- Kanan Atas: Jam Digital -->
+                                <div id="preview-clock-box" class="bg-slate-950/70 backdrop-blur-md border border-blue-500/40 px-3.5 py-1.5 rounded-lg shadow-lg">
+                                    <span id="preview-clock" class="text-sm font-mono font-bold tracking-widest text-blue-400">00:00:00</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bottom: Sosmed Rotator, Now Playing & Progress Goal -->
+                        <div class="flex items-end justify-between">
+                            
+                            <!-- Kiri Bawah: Sosmed Rotator -->
+                            <div id="preview-social-box" class="bg-slate-950/70 backdrop-blur-md border border-slate-700/50 px-3 py-2 rounded-xl flex items-center space-x-3 shadow-lg">
+                                <div class="text-pink-400">
+                                    <!-- Ikon Dinamis via JS -->
+                                    <svg id="social-icon" class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                                </div>
+                                <span id="preview-social-text" class="text-xs font-medium tracking-wide">@CyberChannel</span>
+                            </div>
+
+                            <!-- Tengah/Kanan Bawah: Progress Goal & Now Playing -->
+                            <div class="flex flex-col space-y-2.5 items-end">
+                                <!-- Widget Now Playing (Kapsul/Pill) -->
+                                <div class="bg-slate-950/70 backdrop-blur-md border border-pink-500/40 px-3.5 py-1.5 rounded-full flex items-center space-x-2.5 shadow-lg">
+                                    <svg class="w-3.5 h-3.5 text-pink-400 animate-spin" style="animation-duration: 4s;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path>
+                                    </svg>
+                                    <div class="text-xs">
+                                        <span id="preview-song" class="font-bold text-white">Synthwave Dreams</span>
+                                        <span class="text-slate-400 mx-1">•</span>
+                                        <span id="preview-artist" class="text-slate-300">Neon Rider</span>
+                                    </div>
+                                </div>
+
+                                <!-- Progress Goal Bar -->
+                                <div class="bg-slate-950/80 backdrop-blur-md border border-blue-500/40 p-2.5 rounded-xl w-64 shadow-lg">
+                                    <div class="flex justify-between items-center text-[11px] mb-1.5 font-medium">
+                                        <span id="preview-goal-title" class="text-blue-300 truncate max-w-[160px]">Upgrade GPU RTX 5090</span>
+                                        <span id="preview-goal-percent-text" class="text-slate-300">75%</span>
+                                    </div>
+                                    <div class="w-full bg-slate-900 rounded-full h-1.5 overflow-hidden border border-slate-800">
+                                        <div id="preview-goal-bar" class="bg-gradient-to-r from-blue-500 to-pink-500 h-full rounded-full transition-all duration-300" style="width: 75%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Script Logika Interaktif (Vanilla JS) -->
+    <script>
+        // --- 1. Sistem Tab ---
+        function switchTab(tabName) {
+            const tabs = ['general', 'widgets', 'style', 'output'];
+            tabs.forEach(t => {
+                const btn = document.getElementById(`tab-btn-${t}`);
+                const content = document.getElementById(`tab-content-${t}`);
+                if (t === tabName) {
+                    btn.className = "flex-1 py-2.5 rounded-lg font-medium transition-all text-center bg-gradient-to-r from-pink-500 to-pink-600 text-white shadow-md";
+                    content.classList.remove('hidden');
+                } else {
+                    btn.className = "flex-1 py-2.5 rounded-lg font-medium transition-all text-center text-slate-400 hover:text-white";
+                    content.classList.add('hidden');
+                }
+            });
+        }
+
+        // --- 2. Real-time DOM Binding ---
+        const inputs = {
+            streamer: document.getElementById('input-streamer'),
+            yt: document.getElementById('input-yt'),
+            ig: document.getElementById('input-ig'),
+            tt: document.getElementById('input-tt'),
+            marquee: document.getElementById('input-marquee'),
+            song: document.getElementById('input-song'),
+            artist: document.getElementById('input-artist'),
+            goalTitle: document.getElementById('input-goal-title'),
+            goalPercent: document.getElementById('input-goal-percent'),
+            toggleClock: document.getElementById('toggle-clock'),
+            toggleSocial: document.getElementById('toggle-social'),
+            selectFont: document.getElementById('select-font'),
+            selectBgFx: document.getElementById('select-bgfx')
+        };
+
+        const previews = {
+            streamer: document.getElementById('preview-streamer'),
+            marquee: document.getElementById('preview-marquee'),
+            clockBox: document.getElementById('preview-clock-box'),
+            clock: document.getElementById('preview-clock'),
+            socialBox: document.getElementById('preview-social-box'),
+            socialText: document.getElementById('preview-social-text'),
+            socialIcon: document.getElementById('social-icon'),
+            song: document.getElementById('preview-song'),
+            artist: document.getElementById('preview-artist'),
+            goalTitle: document.getElementById('preview-goal-title'),
+            goalPercentText: document.getElementById('preview-goal-percent-text'),
+            goalBar: document.getElementById('preview-goal-bar'),
+            wrapper: document.getElementById('overlay-wrapper')
+        };
+
+        // Event listener update teks real-time
+        inputs.streamer.addEventListener('input', (e) => previews.streamer.textContent = e.target.value || 'Streamer');
+        inputs.marquee.addEventListener('input', (e) => previews.marquee.textContent = e.target.value);
+        inputs.song.addEventListener('input', (e) => previews.song.textContent = e.target.value);
+        inputs.artist.addEventListener('input', (e) => previews.artist.textContent = e.target.value);
+        inputs.goalTitle.addEventListener('input', (e) => previews.goalTitle.textContent = e.target.value);
+        
+        inputs.goalPercent.addEventListener('input', (e) => {
+            const val = e.target.value;
+            document.getElementById('goal-val-label').textContent = val + '%';
+            previews.goalPercentText.textContent = val + '%';
+            previews.goalBar.style.width = val + '%';
+        });
+
+        // Toggle Widgets
+        inputs.toggleClock.addEventListener('change', (e) => {
+            previews.clockBox.style.display = e.target.checked ? 'block' : 'none';
+        });
+        inputs.toggleSocial.addEventListener('change', (e) => {
+            previews.socialBox.style.display = e.target.checked ? 'flex' : 'none';
+        });
+
+        // Font Switching
+        inputs.selectFont.addEventListener('change', (e) => {
+            previews.wrapper.className = `absolute inset-0 z-10 p-5 flex flex-col justify-between pointer-events-none text-white ${e.target.value}`;
+        });
+
+        // Social Rotator Logic
+        const socialPlatforms = [
+            { name: 'YouTube', valKey: 'yt', svg: '<path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>' },
+            { name: 'Instagram', valKey: 'ig', svg: '<path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>' },
+            { name: 'TikTok', valKey: 'tt', svg: '<path d="M19.589 6.686a4.793 4.793 0 0 1-3.77-4.245V2h-3.445v13.672a2.896 2.896 0 0 1-5.01 1.983 2.892 2.892 0 0 1 .15-3.328 2.892 2.892 0 0 1 2.76-1.291v-3.56a6.435 6.435 0 0 0-5.115 6.208 6.442 6.442 0 0 0 6.442 6.442 6.44 6.44 0 0 0 6.27-5.044 8.04 8.04 0 0 0 4.71 1.543v-3.518a4.777 4.777 0 0 1-2.997-1.025z"/>' }
+        ];
+        let currentSocialIdx = 0;
+        setInterval(() => {
+            if (!inputs.toggleSocial.checked) return;
+            currentSocialIdx = (currentSocialIdx + 1) % socialPlatforms.length;
+            const p = socialPlatforms[currentSocialIdx];
+            previews.socialIcon.innerHTML = p.svg;
+            previews.socialText.textContent = inputs[p.valKey].value || `@${p.name}`;
+        }, 3000);
+
+        // Real-time Clock
+        setInterval(() => {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            previews.clock.textContent = `${hours}:${minutes}:${seconds}`;
+        }, 1000);
+
+        // --- 3. Canvas Animation Engine ---
+        const canvas = document.getElementById('preview-canvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // Stardust Particles Setup
+        let particles = Array.from({ length: 50 }, () => ({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            radius: Math.random() * 1.5 + 0.5,
+            speedY: Math.random() * 0.4 + 0.1,
+            alpha: Math.random()
+        }));
+
+        // Matrix Rain Setup
+        const matrixChars = "01ABCDEFXYZ";
+        const fontSize = 14;
+        let drops = [];
+        function initMatrix() {
+            const columns = Math.floor(canvas.width / fontSize);
+            drops = Array.from({ length: columns }, () => Math.floor(Math.random() * canvas.height));
+        }
+        initMatrix();
+
+        // Neon Grid Offset
+        let gridOffset = 0;
+
+        function animateCanvas() {
+            const fxType = inputs.selectBgFx.value;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Background Dasar Gelap Transparan
+            ctx.fillStyle = "rgba(5, 5, 15, 0.9)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            if (fxType === 'stardust') {
+                ctx.fillStyle = "rgba(236, 72, 153, 0.8)";
+                particles.forEach(p => {
+                    p.y -= p.speedY;
+                    if (p.y < 0) p.y = canvas.height;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(59, 130, 246, ${p.alpha})`;
+                    ctx.fill();
+                });
+            } else if (fxType === 'matrix') {
+                ctx.fillStyle = "rgba(59, 130, 246, 0.15)";
+                ctx.font = `${fontSize}px monospace`;
+                drops.forEach((y, i) => {
+                    const char = matrixChars[Math.floor(Math.random() * matrixChars.length)];
+                    const x = i * fontSize;
+                    ctx.fillText(char, x, y);
+                    if (y > canvas.height && Math.random() > 0.975) {
+                        drops[i] = 0;
+                    }
+                    drops[i] += fontSize;
+                });
+            } else if (fxType === 'neongrid') {
+                gridOffset = (gridOffset + 0.5) % 30;
+                ctx.strokeStyle = "rgba(236, 72, 153, 0.15)";
+                ctx.lineWidth = 1;
+                
+                // Garis Vertikal
+                for (let x = 0; x < canvas.width; x += 30) {
+                    ctx.beginPath();
+                    ctx.moveTo(x, 0);
+                    ctx.lineTo(x, canvas.height);
+                    ctx.stroke();
+                }
+                // Garis Horizontal bergerak
+                for (let y = gridOffset; y < canvas.height; y += 30) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, y);
+                    ctx.lineTo(canvas.width, y);
+                    ctx.stroke();
+                }
+            }
+
+            requestAnimationFrame(animateCanvas);
+        }
+        animateCanvas();
+
+        inputs.selectBgFx.addEventListener('change', () => {
+            if (inputs.selectBgFx.value === 'matrix') initMatrix();
+        });
+
+        // --- 4. URL & Clipboard ---
+        function generateUrl() {
+            const params = new URLSearchParams({
+                streamer: inputs.streamer.value,
+                yt: inputs.yt.value,
+                ig: inputs.ig.value,
+                tt: inputs.tt.value,
+                marquee: inputs.marquee.value,
+                song: inputs.song.value,
+                artist: inputs.artist.value,
+                goalTitle: inputs.goalTitle.value,
+                goalPercent: inputs.goalPercent.value,
+                font: inputs.selectFont.value,
+                fx: inputs.selectBgFx.value
+            });
+
+            const dummyUrl = window.location.origin + window.location.pathname + "?" + params.toString();
+            document.getElementById('output-url-box').value = dummyUrl;
+            document.getElementById('output-container').classList.remove('hidden');
+        }
+
+        function copyUrl() {
+            const box = document.getElementById('output-url-box');
+            box.select();
+            document.execCommand('copy');
+
+            const btn = document.getElementById('copy-btn');
+            const originalText = btn.textContent;
+            btn.textContent = "Copied!";
+            btn.classList.add('bg-pink-600', 'text-white');
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.classList.remove('bg-pink-600', 'text-white');
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
