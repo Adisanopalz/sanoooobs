@@ -45,6 +45,40 @@
         .neon-glow-purple {
             box-shadow: 0 0 25px rgba(168, 85, 247, 0.45);
         }
+
+        /* Mode Khusus OBS Browser Source (Transparan & Full HD 1920x1080) */
+        body.obs-mode {
+            background: transparent !important;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            width: 1920px;
+            height: 1080px;
+        }
+        body.obs-mode header,
+        body.obs-mode main > section:first-child {
+            display: none !important;
+        }
+        body.obs-mode main {
+            display: block !important;
+            padding: 0 !important;
+            max-width: none !important;
+        }
+        body.obs-mode #preview-container {
+            width: 1920px !important;
+            height: 1080px !important;
+            aspect-ratio: unset !important;
+            border: none !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            background: transparent !important;
+        }
+        body.obs-mode #preview-canvas {
+            background: transparent !important;
+        }
+        body.obs-mode #overlay-wrapper {
+            padding: 40px !important;
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950 text-slate-100 min-h-screen font-modern antialiased selection:bg-pink-500 selection:text-white pb-12">
@@ -209,7 +243,7 @@
                 </div>
             </div>
 
-            <!-- Konten Tab: ALERTS (Fitur Tambahan Baru) -->
+            <!-- Konten Tab: ALERTS -->
             <div id="tab-content-alerts" class="space-y-4 tab-content hidden">
                 <p class="text-xs text-slate-400">Simulasi trigger test alert langsung di preview overlay secara interaktif.</p>
                 <div class="grid grid-cols-2 gap-3">
@@ -239,7 +273,7 @@
                     </button>
                 </div>
                 <div id="output-container" class="hidden space-y-3 pt-2">
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400">Hasil URL Overlay</label>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400">Hasil URL Overlay (OBS Ready)</label>
                     <div class="flex space-x-2">
                         <input type="text" id="output-url-box" readonly class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-300 font-mono focus:outline-none">
                         <button onclick="copyUrl()" id="copy-btn" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-semibold rounded-xl border border-slate-700 transition-colors whitespace-nowrap">
@@ -407,6 +441,26 @@
             container: document.getElementById('preview-container')
         };
 
+        // --- Deteksi Otomatis Mode OBS Source ---
+        function checkObsMode() {
+            const urlParams = new URLSearchParams(window.location.search);
+            // Jika ada parameter url atau dibuka langsung tanpa panel, aktifkan obs-mode
+            if (urlParams.has('streamer') || urlParams.has('mode') || window.location.search.length > 1) {
+                document.body.classList.add('obs-mode');
+                // Load parameter dari URL ke input/preview
+                for (let key in inputs) {
+                    if (urlParams.has(key)) {
+                        const val = urlParams.get(key);
+                        if (inputs[key].type === 'checkbox') {
+                            inputs[key].checked = (val === 'true');
+                        } else {
+                            inputs[key].value = val;
+                        }
+                    }
+                }
+            }
+        }
+
         // --- LocalStorage Save & Load ---
         const STORAGE_KEY = 'neoncast_config_v2';
 
@@ -423,8 +477,10 @@
             localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
             
             const status = document.getElementById('save-status');
-            status.textContent = "Saved";
-            setTimeout(() => status.textContent = "Auto-Saved", 1500);
+            if (status) {
+                status.textContent = "Saved";
+                setTimeout(() => status.textContent = "Auto-Saved", 1500);
+            }
         }
 
         function loadFromLocalStorage() {
@@ -441,7 +497,6 @@
                         }
                     }
                 }
-                applyAllInputs();
             } catch (e) {
                 console.error("Gagal memuat data lokal:", e);
             }
@@ -469,7 +524,8 @@
             previews.goalTitle.textContent = inputs.goalTitle.value;
             
             const val = inputs.goalPercent.value;
-            document.getElementById('goal-val-label').textContent = val + '%';
+            const goalLabel = document.getElementById('goal-val-label');
+            if (goalLabel) goalLabel.textContent = val + '%';
             previews.goalPercentText.textContent = val + '%';
             previews.goalBar.style.width = val + '%';
 
@@ -483,7 +539,13 @@
 
             // Font & Glow
             previews.wrapper.className = `absolute inset-0 z-10 p-5 flex flex-col justify-between pointer-events-none text-white ${inputs.selectFont.value}`;
-            previews.container.className = `relative w-full aspect-video rounded-xl overflow-hidden border border-slate-700/60 ${inputs.selectGlow.value}`;
+            
+            // Jika dalam mode OBS, hilangkan border glow preview agar pas transparan
+            if (!document.body.classList.contains('obs-mode')) {
+                previews.container.className = `relative w-full aspect-video rounded-xl overflow-hidden border border-slate-700/60 ${inputs.selectGlow.value}`;
+            } else {
+                previews.container.className = `relative w-full overflow-hidden`;
+            }
         }
 
         // Listeners untuk auto-save & update
@@ -527,8 +589,13 @@
         const ctx = canvas.getContext('2d');
 
         function resizeCanvas() {
-            canvas.width = canvas.parentElement.clientWidth;
-            canvas.height = canvas.parentElement.clientHeight;
+            if (document.body.classList.contains('obs-mode')) {
+                canvas.width = 1920;
+                canvas.height = 1080;
+            } else {
+                canvas.width = canvas.parentElement.clientWidth;
+                canvas.height = canvas.parentElement.clientHeight;
+            }
         }
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
@@ -557,8 +624,11 @@
             const fxType = inputs.selectBgFx.value;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            ctx.fillStyle = "rgba(5, 5, 15, 0.9)";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            // Dalam mode OBS, background canvas transparan penuh
+            if (!document.body.classList.contains('obs-mode')) {
+                ctx.fillStyle = "rgba(5, 5, 15, 0.9)";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
 
             if (fxType === 'stardust') {
                 particles.forEach(p => {
@@ -591,11 +661,11 @@
                 }
             } else if (fxType === 'cyberpulse') {
                 pulseAngle += 0.03;
-                const radius = 80 + Math.sin(pulseAngle) * 20;
+                const radius = 150 + Math.sin(pulseAngle) * 30;
                 ctx.beginPath();
                 ctx.arc(canvas.width / 2, canvas.height / 2, radius, 0, Math.PI * 2);
                 ctx.strokeStyle = "rgba(236, 72, 153, 0.25)";
-                ctx.lineWidth = 2;
+                ctx.lineWidth = 3;
                 ctx.stroke();
             }
 
@@ -607,7 +677,7 @@
             if (inputs.selectBgFx.value === 'matrix') initMatrix();
         });
 
-        // --- Alert Test Simulator & Web Audio ---
+        // --- Alert Test Simulator ---
         function triggerAlert(type) {
             const popup = document.getElementById('alert-popup');
             const title = document.getElementById('alert-title');
@@ -623,27 +693,6 @@
 
             popup.classList.remove('opacity-0', 'scale-95');
             popup.classList.add('opacity-100', 'scale-100');
-
-            // Play Web Audio Sound
-            const soundType = document.getElementById('select-alert-sound').value;
-            if (soundType !== 'none') {
-                try {
-                    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                    const osc = audioCtx.createOscillator();
-                    const gain = audioCtx.createGain();
-                    osc.type = soundType === 'synth' ? 'sine' : 'sawtooth';
-                    osc.frequency.setValueAtTime(soundType === 'synth' ? 587.33 : 880, audioCtx.currentTime);
-                    osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.3);
-                    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
-                    osc.connect(gain);
-                    gain.connect(audioCtx.destination);
-                    osc.start();
-                    osc.stop(audioCtx.currentTime + 0.5);
-                } catch (e) {
-                    console.log("Audio Context diblokir browser sebelum interaksi user.");
-                }
-            }
 
             setTimeout(() => {
                 popup.classList.remove('opacity-100', 'scale-100');
@@ -681,9 +730,12 @@
             }, 2000);
         }
 
-        // Inisialisasi awal load data lokal
+        // Jalankan saat load halaman
         window.addEventListener('DOMContentLoaded', () => {
             loadFromLocalStorage();
+            checkObsMode();
+            applyAllInputs();
+            resizeCanvas();
         });
     </script>
 </body>
