@@ -3,307 +3,339 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Overlay Interaktif YT Shorts</title>
+    <title>Emoji Stream Overlay untuk OBS</title>
+    <!-- Tailwind untuk styling layout sederhana -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Tone.js untuk efek suara procedural -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <!-- Font Poppins untuk UI yang lebih modern -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
-        /* Pengaturan Dasar untuk OBS */
         body {
             margin: 0;
             padding: 0;
             width: 100vw;
             height: 100vh;
             overflow: hidden;
+            background-color: transparent; /* Default untuk OBS */
             font-family: 'Poppins', sans-serif;
-            /* Background transparan untuk OBS, tapi diberi opsi background gelap untuk testing */
-            background-color: transparent;
-            color: white;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.5s ease;
         }
 
-        /* Class untuk mode testing di browser biasa */
+        /* Mode Test untuk melihat di browser biasa */
         body.test-mode {
-            background: linear-gradient(135deg, #1e1e2f, #2a2a40);
-            background-size: cover;
+            background-color: #0f172a;
+            background-image: 
+                radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+                radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
+                radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
         }
 
-        /* Glassmorphism Effect */
-        .glass {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        /* Glassmorphism UI */
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
 
-        /* Layout Utama Vertikal */
-        .overlay-container {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 2rem;
-            box-sizing: border-box;
+        /* Switch Toggle Custom */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #10B981;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #10B981;
         }
 
-        /* Animations */
-        @keyframes slideInLeft {
-            from { transform: translateX(-120%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
-        @keyframes slideOutLeft {
-            from { transform: translateX(0); opacity: 1; }
-            to { transform: translateX(-120%); opacity: 0; }
+        /* Styling Partikel Emoji */
+        .emoji-particle {
+            position: absolute;
+            bottom: -80px;
+            pointer-events: none;
+            z-index: 50;
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3));
+            animation-name: floatUp;
+            animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            animation-fill-mode: forwards;
         }
 
         @keyframes floatUp {
-            0% { transform: translateY(0) scale(1) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(-100vh) scale(1.5) rotate(20deg); opacity: 0; }
+            0% { transform: translateY(0) scale(0.5) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; transform: translateY(-5vh) scale(1.2) rotate(-10deg); }
+            80% { opacity: 1; transform: translateY(-80vh) scale(1) rotate(15deg); }
+            100% { transform: translateY(-110vh) scale(0.8) rotate(30deg); opacity: 0; }
+        }
+        
+        @keyframes swayLeft {
+            0%, 100% { margin-left: 0; }
+            50% { margin-left: -50px; }
+        }
+        @keyframes swayRight {
+            0%, 100% { margin-left: 0; }
+            50% { margin-left: 50px; }
         }
 
-        @keyframes pulseGlow {
-            0% { box-shadow: 0 0 10px rgba(239, 68, 68, 0.5); }
-            50% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.9); }
-            100% { box-shadow: 0 0 10px rgba(239, 68, 68, 0.5); }
-        }
+        .sway-1 { animation: floatUp var(--duration) forwards, swayLeft 3s ease-in-out infinite; }
+        .sway-2 { animation: floatUp var(--duration) forwards, swayRight 4s ease-in-out infinite; }
+        .sway-3 { animation: floatUp var(--duration) forwards, swayLeft 2.5s ease-in-out infinite reverse; }
 
-        /* Hapus alert-box, ganti dengan animasi heart beat */
-        @keyframes heartBeat {
-            0% { transform: scale(1); }
-            14% { transform: scale(1.3); }
-            28% { transform: scale(1); }
-            42% { transform: scale(1.3); }
-            70% { transform: scale(1); }
-        }
-
-        .heart-beat {
-            animation: heartBeat 2s infinite;
-        }
-
-        .emoji-particle {
-            position: absolute;
-            bottom: -50px;
-            font-size: 2rem;
-            pointer-events: none;
-            z-index: -1;
-            animation: floatUp linear forwards;
-        }
-
-        /* Target Bar */
-        .progress-bar-fill {
-            transition: width 0.5s ease-out;
-        }
-
-        /* Tombol Test (Sembunyikan saat di OBS) */
-        #test-controls {
-            position: absolute;
-            top: 10px;
-            right: 10px;
+        .mega-emoji {
+            font-size: 6rem !important;
             z-index: 100;
-            opacity: 0.2;
-            transition: opacity 0.3s;
+            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.4));
         }
-        #test-controls:hover {
-            opacity: 1;
+
+        /* Transisi untuk menyembunyikan panel */
+        .fade-out {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.95);
         }
     </style>
 </head>
-<body>
+<body ondblclick="showPanel()"> <!-- Double click dimana saja untuk memunculkan panel -->
 
-    <!-- Tombol untuk Testing (Jangan khawatir, ini bisa disembunyikan/transparan di OBS) -->
-    <div id="test-controls" class="glass p-2 rounded-lg text-xs flex gap-2">
-        <button onclick="toggleTestMode()" class="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded">Toggle BG</button>
-        <button onclick="simulateEvent()" class="bg-green-600 hover:bg-green-700 px-3 py-1 rounded">Test Event</button>
+    <!-- Container Utama Emoji -->
+    <div id="canvas-container" class="absolute inset-0 w-full h-full pointer-events-none"></div>
+
+    <!-- UI Dashboard Kontrol (Hanya untuk Streamer) -->
+    <div id="control-panel" class="absolute inset-0 flex items-center justify-center z-[999] transition-all duration-500 ease-in-out">
+        <div class="glass-panel w-[90%] max-w-sm rounded-3xl p-6 text-white relative overflow-hidden">
+            
+            <!-- Dekorasi background -->
+            <div class="absolute -top-10 -right-10 w-32 h-32 bg-pink-500/20 rounded-full blur-3xl"></div>
+            <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-blue-500/20 rounded-full blur-3xl"></div>
+
+            <!-- Header -->
+            <div class="text-center mb-6 relative z-10">
+                <h2 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-pink-400 to-indigo-400">
+                    Overlay Interaktif
+                </h2>
+                <p class="text-xs text-gray-400 mt-1">Setup Dashboard untuk OBS</p>
+            </div>
+
+            <div class="space-y-5 relative z-10">
+                <!-- Status Audio -->
+                <div class="bg-white/5 rounded-2xl p-4 border border-white/5 flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-semibold">Status Audio</p>
+                        <p id="audio-status-text" class="text-xs text-red-400 flex items-center gap-1 mt-1">
+                            <span class="relative flex h-2 w-2">
+                              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                              <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                            </span>
+                            Belum Aktif
+                        </p>
+                    </div>
+                    <button id="btn-audio" onclick="initAudio()" class="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 px-4 py-2 rounded-xl text-sm font-semibold shadow-lg shadow-purple-500/30 transition-all active:scale-95">
+                        Aktifkan
+                    </button>
+                </div>
+
+                <!-- Mode Test Toggle -->
+                <div class="bg-white/5 rounded-2xl p-4 border border-white/5 flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-semibold">Background Mode</p>
+                        <p class="text-[10px] text-gray-400 mt-1">Nyalakan saat di browser, matikan di OBS</p>
+                    </div>
+                    <div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
+                        <input type="checkbox" name="toggle" id="bg-toggle" onchange="toggleBackground()" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 border-gray-600 appearance-none cursor-pointer transition-all duration-300 z-10 top-0 left-0" checked/>
+                        <label for="bg-toggle" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-600 cursor-pointer transition-all duration-300"></label>
+                    </div>
+                </div>
+
+                <!-- Uji Coba Trigger -->
+                <div>
+                    <p class="text-xs font-semibold text-gray-400 mb-2 px-1 uppercase tracking-wider">Uji Coba Animasi</p>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="triggerLike()" class="bg-white/10 hover:bg-white/20 border border-white/10 py-2.5 rounded-xl text-sm font-medium transition-colors flex justify-center items-center gap-2">
+                            <span>❤️</span> Like
+                        </button>
+                        <button onclick="spawnEmojiBurst(20)" class="bg-pink-500/20 hover:bg-pink-500/30 border border-pink-500/30 text-pink-300 py-2.5 rounded-xl text-sm font-medium transition-colors flex justify-center items-center gap-2">
+                            <span>🎁</span> Mega Burst
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tombol Sembunyikan (Live Mode) -->
+                <div class="pt-2">
+                    <button onclick="hidePanel()" class="w-full bg-white text-gray-900 hover:bg-gray-200 py-3 rounded-xl font-bold shadow-[0_0_20px_rgba(255,255,255,0.2)] transition-all active:scale-95 flex justify-center items-center gap-2">
+                        <span>👁️‍🗨️</span> Masuk Mode OBS (Sembunyikan)
+                    </button>
+                    <p class="text-[10px] text-center text-gray-400 mt-3 font-medium">
+                        Tips: <i>Double-click</i> layar untuk memunculkan panel ini lagi.
+                    </p>
+                </div>
+            </div>
+        </div>
     </div>
-
-    <div class="overlay-container pointer-events-none">
-        
-        <!-- Bagian Atas: Sub Goal & Info -->
-        <div class="w-full max-w-sm mx-auto mt-10 space-y-4">
-            <!-- Goal Widget -->
-            <div class="glass rounded-xl p-4">
-                <div class="flex justify-between items-center mb-2">
-                    <h2 class="font-bold text-sm tracking-wider uppercase text-yellow-300">🔥 Subscriber Goal</h2>
-                    <span id="goal-text" class="text-xs font-bold bg-yellow-500/20 px-2 py-1 rounded text-yellow-300">1,250 / 2,000</span>
-                </div>
-                <div class="w-full bg-black/40 h-4 rounded-full overflow-hidden border border-white/10">
-                    <div id="goal-bar" class="bg-gradient-to-r from-yellow-400 to-orange-500 h-full progress-bar-fill pulseGlow" style="width: 62.5%;"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Bagian Tengah: Target Like (Pengganti Notifikasi) -->
-        <div class="w-full flex-1 flex flex-col justify-center items-center gap-3">
-            <div class="glass rounded-full px-6 py-4 flex flex-col items-center justify-center border-t-2 border-pink-500 shadow-[0_0_20px_rgba(236,72,153,0.3)]">
-                <span class="text-xs font-bold text-pink-300 mb-1 uppercase tracking-widest">Target Like</span>
-                <div class="flex items-center gap-3 text-3xl font-black">
-                    <span class="heart-beat text-pink-500 drop-shadow-[0_0_10px_rgba(236,72,153,0.8)]">❤️</span>
-                    <span id="like-counter" class="text-white drop-shadow-md">15,420</span>
-                </div>
-                <p class="text-[10px] text-gray-300 mt-2 bg-black/30 px-3 py-1 rounded-full">Bantu tap-tap layar ges!</p>
-            </div>
-        </div>
-
-        <!-- Bagian Bawah: Top Supporter Leaderboard (Pengganti Polling) -->
-        <div class="w-full max-w-sm mx-auto mb-10">
-            <div class="glass rounded-2xl p-5 border-t-4 border-t-yellow-400 relative overflow-hidden">
-                <div class="absolute -right-10 -top-10 w-32 h-32 bg-yellow-500/20 rounded-full blur-2xl"></div>
-                
-                <div class="flex items-center gap-2 mb-4 relative z-10">
-                    <span class="text-xl">🏆</span>
-                    <h3 class="font-bold text-lg leading-tight text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-yellow-600">Top Supporters</h3>
-                </div>
-                
-                <ul id="leaderboard-list" class="space-y-3 relative z-10">
-                    <!-- List Leaderboard akan di-generate via JS -->
-                </ul>
-            </div>
-        </div>
-
-    </div>
-
-    <!-- Container untuk Floating Emojis -->
-    <div id="emoji-container" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
 
     <script>
-        // --- KONFIGURASI STATE ---
-        let subs = 1250;
-        const maxSubs = 2000;
-        let likes = 15420;
-        
-        // State untuk Leaderboard
-        let supporters = [
-            { name: 'Raja_Mabar', points: 1500, role: '🥇' },
-            { name: 'Siti_Pro', points: 1200, role: '🥈' },
-            { name: 'BudiGaming', points: 850, role: '🥉' }
-        ];
-        
-        const emojis = ['❤️', '🔥', '😂', '👍', '🎉', '💯', '✨'];
-        const usernames = ['AsepKnalpot', 'Dewi_Mabar', 'TukangSate', 'SiPalingGG', 'CahayaIlahi', 'BocilKematian'];
+        // --- UI & UX LOGIC ---
+        const controlPanel = document.getElementById('control-panel');
+        const body = document.body;
+        const audioStatusText = document.getElementById('audio-status-text');
+        const btnAudio = document.getElementById('btn-audio');
 
-        // --- FUNGSI UPDATE UI ---
-
-        // 1. Update Sub Goal
-        function updateGoal(amount) {
-            subs += amount;
-            if (subs > maxSubs) subs = maxSubs;
-            
-            const percentage = (subs / maxSubs) * 100;
-            document.getElementById('goal-text').innerText = `${subs.toLocaleString()} / ${maxSubs.toLocaleString()}`;
-            document.getElementById('goal-bar').style.width = `${percentage}%`;
+        function hidePanel() {
+            controlPanel.classList.add('fade-out');
         }
 
-        // 2. Update Likes
-        function updateLikes(amount) {
-            likes += amount;
-            document.getElementById('like-counter').innerText = likes.toLocaleString();
+        function showPanel() {
+            controlPanel.classList.remove('fade-out');
         }
 
-        // 3. Update Leaderboard
-        function updateLeaderboard(randomUser, pointsAdded) {
-            if (randomUser) {
-                let existingUser = supporters.find(s => s.name === randomUser);
-                if (existingUser) {
-                    existingUser.points += pointsAdded;
-                } else {
-                    supporters[2].points += pointsAdded;
-                    if (Math.random() > 0.5) supporters[2].name = randomUser;
-                }
-                supporters.sort((a, b) => b.points - a.points);
-            }
-            
-            const listContainer = document.getElementById('leaderboard-list');
-            listContainer.innerHTML = '';
-            const medals = ['🥇', '🥈', '🥉'];
-            
-            supporters.forEach((sup, index) => {
-                const li = document.createElement('li');
-                li.className = 'flex justify-between items-center bg-black/20 p-2 rounded-lg border border-white/5';
-                li.innerHTML = `
-                    <div class="flex items-center gap-2">
-                        <span class="text-lg drop-shadow-md">${medals[index]}</span>
-                        <span class="font-semibold text-sm drop-shadow-md text-white/90">${sup.name}</span>
-                    </div>
-                    <div class="text-xs font-bold bg-white/10 px-2 py-1 rounded text-yellow-300">
-                        ${sup.points.toLocaleString()} pts
-                    </div>
-                `;
-                listContainer.appendChild(li);
-            });
+        function toggleBackground() {
+            body.classList.toggle('test-mode');
         }
 
-        // 4. Floating Emoji
-        function createEmoji(specificEmoji = null) {
-            const container = document.getElementById('emoji-container');
-            const emojiEl = document.createElement('div');
+        function updateAudioUI() {
+            audioStatusText.innerHTML = `
+                <span class="relative flex h-2 w-2">
+                  <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500 shadow-[0_0_8px_#10B981]"></span>
+                </span>
+                Aktif & Siap!
+            `;
+            audioStatusText.classList.replace('text-red-400', 'text-green-400');
+            btnAudio.innerText = '✓ Selesai';
+            btnAudio.classList.replace('from-indigo-500', 'from-emerald-500');
+            btnAudio.classList.replace('to-purple-600', 'to-green-600');
+            btnAudio.disabled = true;
+        }
+
+        // --- KONFIGURASI EMOJI ---
+        const emojiSets = {
+            likes: ['❤️', '💖', '💗', '💓', '💕'],
+            reactions: ['😂', '🔥', '💀', '😭', '🤯', '💯', '✨', '👀'],
+            gifts: ['🎁', '💎', '👑', '🚀', '⭐', '🎉'],
+            faces: ['😎', '🥳', '🥺', '😡', '😱']
+        };
+        const allEmojis = Object.values(emojiSets).flat();
+
+        // --- SISTEM SUARA DENGAN TONE.JS ---
+        let audioInitialized = false;
+        let popSynth, sparkleSynth;
+
+        async function initAudio() {
+            if (audioInitialized) return;
             
-            const emoji = specificEmoji || emojis[Math.floor(Math.random() * emojis.length)];
-            const leftPos = Math.random() * 90 + 5; 
-            const duration = Math.random() * 2 + 3; 
+            await Tone.start();
+            
+            popSynth = new Tone.PolySynth(Tone.Synth, {
+                oscillator: { type: "sine" },
+                envelope: { attack: 0.01, decay: 0.1, sustain: 0, release: 0.1 }
+            }).toDestination();
+            popSynth.volume.value = -15;
 
-            emojiEl.classList.add('emoji-particle');
-            emojiEl.innerText = emoji;
-            emojiEl.style.left = `${leftPos}%`;
-            emojiEl.style.animationDuration = `${duration}s`;
+            sparkleSynth = new Tone.PolySynth(Tone.Synth, {
+                oscillator: { type: "triangle" },
+                envelope: { attack: 0.05, decay: 0.3, sustain: 0.1, release: 1 }
+            }).toDestination();
+            sparkleSynth.volume.value = -10;
 
-            container.appendChild(emojiEl);
+            audioInitialized = true;
+            updateAudioUI();
+        }
+
+        function playPopSound() {
+            if (!audioInitialized) return;
+            const notes = ["C5", "E5", "G5", "C6"];
+            const randomNote = notes[Math.floor(Math.random() * notes.length)];
+            popSynth.triggerAttackRelease(randomNote, "32n");
+        }
+
+        function playSparkleSound() {
+            if (!audioInitialized) return;
+            const now = Tone.now();
+            sparkleSynth.triggerAttackRelease("C5", "16n", now);
+            sparkleSynth.triggerAttackRelease("E5", "16n", now + 0.1);
+            sparkleSynth.triggerAttackRelease("G5", "16n", now + 0.2);
+            sparkleSynth.triggerAttackRelease("C6", "8n", now + 0.3);
+        }
+
+        // --- SISTEM PEMBUATAN EMOJI ---
+        const container = document.getElementById('canvas-container');
+
+        function createEmoji(options = {}) {
+            const el = document.createElement('div');
+            
+            const emojiChar = options.char || allEmojis[Math.floor(Math.random() * allEmojis.length)];
+            const size = options.size || (Math.random() * 1.5 + 1.5); 
+            const leftPos = options.left !== undefined ? options.left : (Math.random() * 90 + 5); 
+            const duration = options.duration || (Math.random() * 3 + 3); 
+            
+            const swayClass = `sway-${Math.floor(Math.random() * 3) + 1}`;
+
+            el.innerText = emojiChar;
+            el.className = `emoji-particle ${swayClass}`;
+            if(options.isMega) el.classList.add('mega-emoji');
+
+            el.style.left = `${leftPos}%`;
+            el.style.fontSize = `${size}rem`;
+            el.style.setProperty('--duration', `${duration}s`);
+            
+            const startRotation = Math.random() * 60 - 30;
+            el.style.transform = `rotate(${startRotation}deg)`;
+
+            container.appendChild(el);
 
             setTimeout(() => {
-                emojiEl.remove();
+                if (el.parentNode === container) container.removeChild(el);
             }, duration * 1000);
         }
 
-        // --- MODE SIMULASI (Untuk Preview) ---
-        
-        let simInterval;
-        let emojiInterval;
-        let likeInterval;
+        // --- FUNGSI TRIGGER UNTUK EVENT ---
+        function triggerLike() {
+            const char = emojiSets.likes[Math.floor(Math.random() * emojiSets.likes.length)];
+            createEmoji({ char: char });
+            if(Math.random() > 0.5) playPopSound(); 
+        }
 
+        function spawnEmojiBurst(count = 10, specialChar = null) {
+            playSparkleSound();
+            
+            for (let i = 0; i < count; i++) {
+                setTimeout(() => {
+                    const isMega = (i === Math.floor(count / 2)); 
+                    const leftPos = 20 + Math.random() * 60; 
+                    
+                    let char = specialChar;
+                    if(!char) {
+                        const set = count > 10 ? emojiSets.gifts : emojiSets.reactions;
+                        char = set[Math.floor(Math.random() * set.length)];
+                    }
+
+                    createEmoji({
+                        char: char,
+                        isMega: isMega,
+                        left: leftPos,
+                        duration: Math.random() * 2 + 2.5 
+                    });
+                    
+                    playPopSound();
+                    
+                }, i * 100); 
+            }
+        }
+
+        // --- SIMULASI OTOMATIS (Untuk Preview) ---
         function startSimulation() {
-            updateLeaderboard('', 0); // Initial render
+            setInterval(() => {
+                const amount = Math.floor(Math.random() * 3);
+                for(let i=0; i<amount; i++) setTimeout(triggerLike, i * 200);
+            }, 1000);
 
-            // Simulasi Likes (Tap layar)
-            likeInterval = setInterval(() => {
-                updateLikes(Math.floor(Math.random() * 15) + 1);
-                if(Math.random() > 0.5) createEmoji('❤️');
-            }, 800);
-
-            // Simulasi Emoji
-            emojiInterval = setInterval(() => {
-                if(Math.random() > 0.4) createEmoji();
-            }, 500);
-
-            // Simulasi Event (Nyawer / Sub)
-            simInterval = setInterval(() => {
-                const randomUser = usernames[Math.floor(Math.random() * usernames.length)];
-                const eventRand = Math.random();
-
-                if (eventRand < 0.4) {
-                    updateLeaderboard(randomUser, Math.floor(Math.random() * 100) + 50);
-                } else if (eventRand < 0.6) {
-                    updateGoal(1);
-                    for(let i=0; i<8; i++) setTimeout(() => createEmoji('🎉'), i*150);
-                }
-            }, 3000);
+            setInterval(() => {
+                if(Math.random() > 0.8) spawnEmojiBurst(Math.floor(Math.random() * 8) + 4);
+            }, 6000);
         }
 
-        function toggleTestMode() {
-            document.body.classList.toggle('test-mode');
-        }
-
-        function simulateEvent() {
-            const randomUser = usernames[Math.floor(Math.random() * usernames.length)];
-            updateLeaderboard(randomUser, 500);
-            updateGoal(3);
-            for(let i=0; i<15; i++) setTimeout(() => createEmoji('🎉'), i*50);
-        }
-
-        // Init
-        startSimulation();
+        // INIT
         document.body.classList.add('test-mode');
+        startSimulation();
 
     </script>
 </body>
