@@ -7,19 +7,21 @@
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Press+Start+2P&family=Inter:wght@300;400;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Press+Start+2P&family=Inter:wght@300;400;600&family=Share+Tech+Mono&family=Bungee&family=VT323&display=swap" rel="stylesheet">
     <style>
         .font-modern { font-family: 'Inter', sans-serif; }
         .font-pixel { font-family: 'Press Start 2P', monospace; font-size: 0.75rem; }
         .font-cyber { font-family: 'Orbitron', sans-serif; }
         .font-tech { font-family: 'Share Tech Mono', monospace; }
+        .font-arcade { font-family: 'VT323', monospace; font-size: 1.25rem; }
+        .font-bungee { font-family: 'Bungee', cursive; }
 
         /* Glassmorphism Panel */
         .glass-panel {
-            background: rgba(15, 23, 42, 0.75);
+            background: rgba(15, 23, 42, 0.8);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.12);
         }
 
         /* Marquee Animation */
@@ -35,109 +37,139 @@
 
         /* Neon Glows */
         .neon-glow-pink {
-            box-shadow: 0 0 20px rgba(236, 72, 153, 0.4);
+            box-shadow: 0 0 25px rgba(236, 72, 153, 0.45);
         }
         .neon-glow-blue {
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.45);
+        }
+        .neon-glow-purple {
+            box-shadow: 0 0 25px rgba(168, 85, 247, 0.45);
         }
     </style>
 </head>
-<body class="bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950 text-slate-100 min-h-screen font-modern antialiased selection:bg-pink-500 selection:text-white">
+<body class="bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950 text-slate-100 min-h-screen font-modern antialiased selection:bg-pink-500 selection:text-white pb-12">
 
     <!-- Header / Navigasi Utama -->
-    <header class="border-b border-slate-800 bg-slate-950/50 backdrop-blur-md sticky top-0 z-50 px-6 py-4 flex items-center justify-between">
+    <header class="border-b border-slate-800 bg-slate-950/60 backdrop-blur-md sticky top-0 z-50 px-6 py-4 flex items-center justify-between">
         <div class="flex items-center space-x-3">
             <div class="w-9 h-9 rounded-lg bg-gradient-to-tr from-pink-500 to-blue-500 flex items-center justify-center neon-glow-pink">
                 <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
                 </svg>
             </div>
-            <h1 class="text-xl font-extrabold tracking-wider bg-gradient-to-r from-pink-400 to-blue-400 bg-clip-text text-transparent font-cyber">NEONCAST</h1>
+            <h1 class="text-xl font-extrabold tracking-wider bg-gradient-to-r from-pink-400 to-blue-400 bg-clip-text text-transparent font-cyber">NEONCAST PRO</h1>
         </div>
-        <div class="text-xs text-slate-400 hidden sm:block">Stream Overlay Studio Pro</div>
+        <div class="flex items-center space-x-3">
+            <button onclick="resetToDefault()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 rounded-lg border border-slate-700 transition-all">Reset Default</button>
+            <div class="text-xs text-emerald-400 bg-emerald-950/50 border border-emerald-800 px-3 py-1 rounded-lg flex items-center space-x-1.5">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span id="save-status">Auto-Saved</span>
+            </div>
+        </div>
     </header>
 
-    <!-- Konten Utama: Desktop Grid 2 Kolom, Mobile Vertikal Stack -->
-    <main class="max-w-[1600px] mx-auto p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+    <!-- Konten Utama -->
+    <main class="max-w-[1700px] mx-auto p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
-        <!-- KOLOM KIRI (40% pada LG = col-span-5): Panel Kontrol Tabs -->
+        <!-- KOLOM KIRI (5 Kolom): Panel Kontrol Tabs Lengkap -->
         <section class="lg:col-span-5 glass-panel rounded-2xl p-5 shadow-2xl flex flex-col space-y-6 order-2 lg:order-1">
             
             <!-- Navigasi Tab -->
-            <div class="flex rounded-xl bg-slate-900/80 p-1 border border-slate-800 text-sm">
-                <button onclick="switchTab('general')" id="tab-btn-general" class="flex-1 py-2.5 rounded-lg font-medium transition-all text-center bg-gradient-to-r from-pink-500 to-pink-600 text-white shadow-md">General</button>
-                <button onclick="switchTab('widgets')" id="tab-btn-widgets" class="flex-1 py-2.5 rounded-lg font-medium transition-all text-center text-slate-400 hover:text-white">Widgets</button>
-                <button onclick="switchTab('style')" id="tab-btn-style" class="flex-1 py-2.5 rounded-lg font-medium transition-all text-center text-slate-400 hover:text-white">Style</button>
-                <button onclick="switchTab('output')" id="tab-btn-output" class="flex-1 py-2.5 rounded-lg font-medium transition-all text-center text-slate-400 hover:text-white">Output</button>
+            <div class="grid grid-cols-5 gap-1 bg-slate-900/80 p-1.5 rounded-xl border border-slate-800 text-xs font-medium">
+                <button onclick="switchTab('general')" id="tab-btn-general" class="py-2 rounded-lg transition-all text-center bg-gradient-to-r from-pink-500 to-pink-600 text-white shadow-md">General</button>
+                <button onclick="switchTab('widgets')" id="tab-btn-widgets" class="py-2 rounded-lg transition-all text-center text-slate-400 hover:text-white">Widgets</button>
+                <button onclick="switchTab('style')" id="tab-btn-style" class="py-2 rounded-lg transition-all text-center text-slate-400 hover:text-white">Style</button>
+                <button onclick="switchTab('alerts')" id="tab-btn-alerts" class="py-2 rounded-lg transition-all text-center text-slate-400 hover:text-white">Alerts</button>
+                <button onclick="switchTab('output')" id="tab-btn-output" class="py-2 rounded-lg transition-all text-center text-slate-400 hover:text-white">Output</button>
             </div>
 
             <!-- Konten Tab: GENERAL -->
             <div id="tab-content-general" class="space-y-4 tab-content">
                 <div>
                     <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Streamer Name (Watermark)</label>
-                    <input type="text" id="input-streamer" value="CyberStreamer" placeholder="Contoh: AlexGaming" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-pink-500 transition-colors">
+                    <div class="flex space-x-2">
+                        <input type="text" id="input-streamer" value="CyberStreamer" placeholder="Contoh: AlexGaming" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-pink-500 transition-colors">
+                        <button onclick="clearField('input-streamer', 'preview-streamer', 'Streamer')" class="px-3 bg-slate-800 hover:bg-slate-700 text-xs rounded-xl border border-slate-700 text-slate-400 hover:text-white" title="Kosongkan">✕</button>
+                    </div>
                 </div>
                 <div>
                     <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">YouTube Username</label>
-                    <input type="text" id="input-yt" value="@CyberChannel" placeholder="@channel" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-pink-500 transition-colors">
+                    <div class="flex space-x-2">
+                        <input type="text" id="input-yt" value="@CyberChannel" placeholder="@channel" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-pink-500 transition-colors">
+                        <button onclick="clearField('input-yt')" class="px-3 bg-slate-800 hover:bg-slate-700 text-xs rounded-xl border border-slate-700 text-slate-400 hover:text-white">✕</button>
+                    </div>
                 </div>
                 <div>
                     <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Instagram Username</label>
-                    <input type="text" id="input-ig" value="@alex_stream" placeholder="@username" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-pink-500 transition-colors">
+                    <div class="flex space-x-2">
+                        <input type="text" id="input-ig" value="@alex_stream" placeholder="@username" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-pink-500 transition-colors">
+                        <button onclick="clearField('input-ig')" class="px-3 bg-slate-800 hover:bg-slate-700 text-xs rounded-xl border border-slate-700 text-slate-400 hover:text-white">✕</button>
+                    </div>
                 </div>
                 <div>
                     <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">TikTok Username</label>
-                    <input type="text" id="input-tt" value="@alextiktok" placeholder="@username" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-pink-500 transition-colors">
+                    <div class="flex space-x-2">
+                        <input type="text" id="input-tt" value="@alextiktok" placeholder="@username" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-pink-500 transition-colors">
+                        <button onclick="clearField('input-tt')" class="px-3 bg-slate-800 hover:bg-slate-700 text-xs rounded-xl border border-slate-700 text-slate-400 hover:text-white">✕</button>
+                    </div>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Custom Marquee Text</label>
-                    <input type="text" id="input-marquee" value="⚡ SELAMAT DATANG DI LIVESTREAM! JANGAN LUPA SUBSCRIBE & LIKE! ⚡" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-pink-500 transition-colors">
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Custom Marquee Teks Berjalan</label>
+                    <div class="flex space-x-2">
+                        <input type="text" id="input-marquee" value="⚡ SELAMAT DATANG DI LIVESTREAM! JANGAN LUPA SUBSCRIBE & LIKE! ⚡" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-pink-500 transition-colors">
+                        <button onclick="clearField('input-marquee', 'preview-marquee', '')" class="px-3 bg-slate-800 hover:bg-slate-700 text-xs rounded-xl border border-slate-700 text-slate-400 hover:text-white">✕</button>
+                    </div>
                 </div>
             </div>
 
             <!-- Konten Tab: WIDGETS -->
-            <div id="tab-content-widgets" class="space-y-5 tab-content hidden">
-                <!-- Toggles / Switches -->
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="bg-slate-900/60 p-3.5 rounded-xl border border-slate-800 flex items-center justify-between">
+            <div id="tab-content-widgets" class="space-y-4 tab-content hidden">
+                <!-- Toggles / Switches Utama -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800 flex items-center justify-between">
                         <span class="text-xs font-medium text-slate-300">Jam Digital</span>
                         <label class="relative inline-flex items-center cursor-pointer">
                             <input type="checkbox" id="toggle-clock" checked class="sr-only peer">
                             <div class="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-pink-500"></div>
                         </label>
                     </div>
-                    <div class="bg-slate-900/60 p-3.5 rounded-xl border border-slate-800 flex items-center justify-between">
+                    <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800 flex items-center justify-between">
                         <span class="text-xs font-medium text-slate-300">Sosmed Rotator</span>
                         <label class="relative inline-flex items-center cursor-pointer">
                             <input type="checkbox" id="toggle-social" checked class="sr-only peer">
                             <div class="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
                         </label>
                     </div>
-                </div>
-
-                <div class="border-t border-slate-800/80 pt-4 space-y-4">
-                    <h3 class="text-xs font-bold uppercase tracking-wider text-pink-400">Widget Now Playing</h3>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-xs text-slate-400 mb-1">Nama Lagu</label>
-                            <input type="text" id="input-song" value="Synthwave Dreams" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-pink-500">
-                        </div>
-                        <div>
-                            <label class="block text-xs text-slate-400 mb-1">Nama Artis</label>
-                            <input type="text" id="input-artist" value="Neon Rider" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-pink-500">
-                        </div>
+                    <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800 flex items-center justify-between">
+                        <span class="text-xs font-medium text-slate-300">Now Playing</span>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="toggle-music" checked class="sr-only peer">
+                            <div class="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-pink-500"></div>
+                        </label>
+                    </div>
+                    <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800 flex items-center justify-between">
+                        <span class="text-xs font-medium text-slate-300">Progress Goal</span>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="toggle-goal" checked class="sr-only peer">
+                            <div class="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
+                        </label>
                     </div>
                 </div>
 
-                <div class="border-t border-slate-800/80 pt-4 space-y-4">
-                    <h3 class="text-xs font-bold uppercase tracking-wider text-blue-400">Widget Progress Goal</h3>
-                    <div>
-                        <label class="block text-xs text-slate-400 mb-1">Target Judul</label>
-                        <input type="text" id="input-goal-title" value="Upgrade GPU RTX 5090" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-blue-500 mb-3">
+                <div class="border-t border-slate-800/80 pt-3 space-y-3">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-pink-400">Pengaturan Now Playing</h3>
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="text" id="input-song" value="Synthwave Dreams" placeholder="Judul Lagu" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-pink-500">
+                        <input type="text" id="input-artist" value="Neon Rider" placeholder="Artis" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-pink-500">
                     </div>
+                </div>
+
+                <div class="border-t border-slate-800/80 pt-3 space-y-3">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-blue-400">Pengaturan Progress Goal</h3>
+                    <input type="text" id="input-goal-title" value="Upgrade GPU RTX 5090" placeholder="Judul Target" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500 mb-2">
                     <div>
                         <div class="flex justify-between text-xs text-slate-400 mb-1">
-                            <span>Persentase Progress</span>
+                            <span>Persentase</span>
                             <span id="goal-val-label">75%</span>
                         </div>
                         <input type="range" id="input-goal-percent" min="0" max="100" value="75" class="w-full accent-blue-500 cursor-pointer">
@@ -153,15 +185,47 @@
                         <option value="font-modern">Modern Sans (Inter)</option>
                         <option value="font-cyber">Cybertech (Orbitron)</option>
                         <option value="font-tech">Tech Mono (Share Tech)</option>
-                        <option value="font-pixel">Pixel / Retro (Press Start)</option>
+                        <option value="font-pixel">Pixel Retro (Press Start)</option>
+                        <option value="font-arcade">Arcade (VT323)</option>
+                        <option value="font-bungee">Bungee (Bold Arcade)</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Background FX</label>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Background FX Canvas</label>
                     <select id="select-bgfx" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-pink-500 transition-colors">
                         <option value="stardust">Stardust / Partikel</option>
                         <option value="matrix">Matrix Rain</option>
                         <option value="neongrid">Neon Grid</option>
+                        <option value="cyberpulse">Cyber Pulse Core</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Glow Border Tema</label>
+                    <select id="select-glow" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-pink-500 transition-colors">
+                        <option value="neon-glow-pink">Neon Pink Glow</option>
+                        <option value="neon-glow-blue">Electric Blue Glow</option>
+                        <option value="neon-glow-purple">Cyber Purple Glow</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Konten Tab: ALERTS (Fitur Tambahan Baru) -->
+            <div id="tab-content-alerts" class="space-y-4 tab-content hidden">
+                <p class="text-xs text-slate-400">Simulasi trigger test alert langsung di preview overlay secara interaktif.</p>
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="triggerAlert('follower')" class="py-3 px-3 bg-pink-600/20 hover:bg-pink-600/30 border border-pink-500/40 text-pink-300 rounded-xl text-xs font-bold transition-all">
+                        Test Follower Alert
+                    </button>
+                    <button onclick="triggerAlert('donation')" class="py-3 px-3 bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/40 text-blue-300 rounded-xl text-xs font-bold transition-all">
+                        Test Donasi Alert
+                    </button>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Custom Alert Sound Simulation</label>
+                    <select id="select-alert-sound" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3 py-2 text-sm">
+                        <option value="synth">Synth Chime (Web Audio)</option>
+                        <option value="cyber">Cyber Laser</option>
+                        <option value="none">Mute / Tanpa Suara</option>
                     </select>
                 </div>
             </div>
@@ -169,7 +233,7 @@
             <!-- Konten Tab: OUTPUT -->
             <div id="tab-content-output" class="space-y-4 tab-content hidden">
                 <div>
-                    <p class="text-xs text-slate-400 mb-3">Klik tombol di bawah untuk menghasilkan URL konfigurasi overlay stream unik yang siap dipakai di OBS Studio / Streamlabs.</p>
+                    <p class="text-xs text-slate-400 mb-3">Salin URL konfigurasi unik ini dan masukkan sebagai browser source di OBS Studio / Streamlabs.</p>
                     <button onclick="generateUrl()" class="w-full py-3.5 px-4 rounded-xl font-bold bg-gradient-to-r from-pink-500 to-blue-500 text-white shadow-lg shadow-pink-500/20 hover:opacity-90 active:scale-[0.99] transition-all">
                         Generate Overlay URL
                     </button>
@@ -187,15 +251,15 @@
 
         </section>
 
-        <!-- KOLOM KANAN (60% pada LG = col-span-7): Live Preview 16:9 Sticky -->
+        <!-- KOLOM KANAN (7 Kolom): Live Preview 16:9 Sticky -->
         <section class="lg:col-span-7 sticky top-24 order-1 lg:order-2">
             <div class="glass-panel rounded-2xl p-4 shadow-2xl border border-slate-800">
                 <div class="flex items-center justify-between mb-3 px-2">
                     <span class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center space-x-2">
                         <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
-                        <span>Live Preview (16:9)</span>
+                        <span>Live Preview (16:9 Stream Source)</span>
                     </span>
-                    <span class="text-[10px] bg-slate-800/80 text-slate-300 px-2.5 py-1 rounded-full border border-slate-700">Real-Time Binding</span>
+                    <span class="text-[10px] bg-slate-800/80 text-slate-300 px-2.5 py-1 rounded-full border border-slate-700">Auto-Saved Storage Active</span>
                 </div>
 
                 <!-- Container 16:9 Absolute Layering -->
@@ -210,7 +274,7 @@
                         <!-- Top: Marquee & Header Info -->
                         <div class="space-y-2">
                             <!-- Marquee Bar -->
-                            <div class="w-full bg-slate-900/60 backdrop-blur-sm border border-pink-500/30 rounded-lg overflow-hidden py-1 px-3">
+                            <div id="preview-marquee-box" class="w-full bg-slate-900/60 backdrop-blur-sm border border-pink-500/30 rounded-lg overflow-hidden py-1 px-3">
                                 <div id="preview-marquee" class="animate-marquee text-xs font-semibold tracking-wide text-pink-300">
                                     ⚡ SELAMAT DATANG DI LIVESTREAM! JANGAN LUPA SUBSCRIBE & LIKE! ⚡
                                 </div>
@@ -218,7 +282,7 @@
 
                             <div class="flex justify-between items-start">
                                 <!-- Kiri Atas: Streamer Name -->
-                                <div class="bg-slate-950/70 backdrop-blur-md border border-slate-700/50 px-3.5 py-1.5 rounded-lg flex items-center space-x-2 shadow-lg">
+                                <div id="preview-streamer-box" class="bg-slate-950/70 backdrop-blur-md border border-slate-700/50 px-3.5 py-1.5 rounded-lg flex items-center space-x-2 shadow-lg">
                                     <div class="w-2 h-2 rounded-full bg-pink-500"></div>
                                     <span id="preview-streamer" class="text-sm font-bold tracking-wide text-white">CyberStreamer</span>
                                 </div>
@@ -230,13 +294,20 @@
                             </div>
                         </div>
 
+                        <!-- Center Popup Alert Simulation -->
+                        <div id="alert-popup" class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-0 transition-all duration-300 scale-95">
+                            <div class="bg-slate-950/90 border-2 border-pink-500 px-6 py-4 rounded-2xl shadow-2xl text-center space-y-1 neon-glow-pink">
+                                <p id="alert-title" class="text-xs font-bold uppercase tracking-widest text-pink-400">New Follower Alert!</p>
+                                <p id="alert-desc" class="text-lg font-black text-white">@Viewer_Baru bergabung ke stream!</p>
+                            </div>
+                        </div>
+
                         <!-- Bottom: Sosmed Rotator, Now Playing & Progress Goal -->
                         <div class="flex items-end justify-between">
                             
                             <!-- Kiri Bawah: Sosmed Rotator -->
                             <div id="preview-social-box" class="bg-slate-950/70 backdrop-blur-md border border-slate-700/50 px-3 py-2 rounded-xl flex items-center space-x-3 shadow-lg">
                                 <div class="text-pink-400">
-                                    <!-- Ikon Dinamis via JS -->
                                     <svg id="social-icon" class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
                                 </div>
                                 <span id="preview-social-text" class="text-xs font-medium tracking-wide">@CyberChannel</span>
@@ -245,7 +316,7 @@
                             <!-- Tengah/Kanan Bawah: Progress Goal & Now Playing -->
                             <div class="flex flex-col space-y-2.5 items-end">
                                 <!-- Widget Now Playing (Kapsul/Pill) -->
-                                <div class="bg-slate-950/70 backdrop-blur-md border border-pink-500/40 px-3.5 py-1.5 rounded-full flex items-center space-x-2.5 shadow-lg">
+                                <div id="preview-music-box" class="bg-slate-950/70 backdrop-blur-md border border-pink-500/40 px-3.5 py-1.5 rounded-full flex items-center space-x-2.5 shadow-lg">
                                     <svg class="w-3.5 h-3.5 text-pink-400 animate-spin" style="animation-duration: 4s;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path>
                                     </svg>
@@ -257,7 +328,7 @@
                                 </div>
 
                                 <!-- Progress Goal Bar -->
-                                <div class="bg-slate-950/80 backdrop-blur-md border border-blue-500/40 p-2.5 rounded-xl w-64 shadow-lg">
+                                <div id="preview-goal-box" class="bg-slate-950/80 backdrop-blur-md border border-blue-500/40 p-2.5 rounded-xl w-64 shadow-lg">
                                     <div class="flex justify-between items-center text-[11px] mb-1.5 font-medium">
                                         <span id="preview-goal-title" class="text-blue-300 truncate max-w-[160px]">Upgrade GPU RTX 5090</span>
                                         <span id="preview-goal-percent-text" class="text-slate-300">75%</span>
@@ -277,25 +348,25 @@
 
     </main>
 
-    <!-- Script Logika Interaktif (Vanilla JS) -->
+    <!-- Script Logika Interaktif & LocalStorage -->
     <script>
-        // --- 1. Sistem Tab ---
+        // --- Sistem Tab ---
         function switchTab(tabName) {
-            const tabs = ['general', 'widgets', 'style', 'output'];
+            const tabs = ['general', 'widgets', 'style', 'alerts', 'output'];
             tabs.forEach(t => {
                 const btn = document.getElementById(`tab-btn-${t}`);
                 const content = document.getElementById(`tab-content-${t}`);
                 if (t === tabName) {
-                    btn.className = "flex-1 py-2.5 rounded-lg font-medium transition-all text-center bg-gradient-to-r from-pink-500 to-pink-600 text-white shadow-md";
+                    btn.className = "py-2 rounded-lg transition-all text-center bg-gradient-to-r from-pink-500 to-pink-600 text-white shadow-md";
                     content.classList.remove('hidden');
                 } else {
-                    btn.className = "flex-1 py-2.5 rounded-lg font-medium transition-all text-center text-slate-400 hover:text-white";
+                    btn.className = "py-2 rounded-lg transition-all text-center text-slate-400 hover:text-white";
                     content.classList.add('hidden');
                 }
             });
         }
 
-        // --- 2. Real-time DOM Binding ---
+        // --- Variabel DOM & Input ---
         const inputs = {
             streamer: document.getElementById('input-streamer'),
             yt: document.getElementById('input-yt'),
@@ -308,54 +379,126 @@
             goalPercent: document.getElementById('input-goal-percent'),
             toggleClock: document.getElementById('toggle-clock'),
             toggleSocial: document.getElementById('toggle-social'),
+            toggleMusic: document.getElementById('toggle-music'),
+            toggleGoal: document.getElementById('toggle-goal'),
             selectFont: document.getElementById('select-font'),
-            selectBgFx: document.getElementById('select-bgfx')
+            selectBgFx: document.getElementById('select-bgfx'),
+            selectGlow: document.getElementById('select-glow')
         };
 
         const previews = {
             streamer: document.getElementById('preview-streamer'),
+            streamerBox: document.getElementById('preview-streamer-box'),
             marquee: document.getElementById('preview-marquee'),
+            marqueeBox: document.getElementById('preview-marquee-box'),
             clockBox: document.getElementById('preview-clock-box'),
             clock: document.getElementById('preview-clock'),
             socialBox: document.getElementById('preview-social-box'),
             socialText: document.getElementById('preview-social-text'),
             socialIcon: document.getElementById('social-icon'),
+            musicBox: document.getElementById('preview-music-box'),
             song: document.getElementById('preview-song'),
             artist: document.getElementById('preview-artist'),
+            goalBox: document.getElementById('preview-goal-box'),
             goalTitle: document.getElementById('preview-goal-title'),
             goalPercentText: document.getElementById('preview-goal-percent-text'),
             goalBar: document.getElementById('preview-goal-bar'),
-            wrapper: document.getElementById('overlay-wrapper')
+            wrapper: document.getElementById('overlay-wrapper'),
+            container: document.getElementById('preview-container')
         };
 
-        // Event listener update teks real-time
-        inputs.streamer.addEventListener('input', (e) => previews.streamer.textContent = e.target.value || 'Streamer');
-        inputs.marquee.addEventListener('input', (e) => previews.marquee.textContent = e.target.value);
-        inputs.song.addEventListener('input', (e) => previews.song.textContent = e.target.value);
-        inputs.artist.addEventListener('input', (e) => previews.artist.textContent = e.target.value);
-        inputs.goalTitle.addEventListener('input', (e) => previews.goalTitle.textContent = e.target.value);
-        
-        inputs.goalPercent.addEventListener('input', (e) => {
-            const val = e.target.value;
+        // --- LocalStorage Save & Load ---
+        const STORAGE_KEY = 'neoncast_config_v2';
+
+        function saveToLocalStorage() {
+            const data = {};
+            for (let key in inputs) {
+                const el = inputs[key];
+                if (el.type === 'checkbox') {
+                    data[key] = el.checked;
+                } else {
+                    data[key] = el.value;
+                }
+            }
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            
+            const status = document.getElementById('save-status');
+            status.textContent = "Saved";
+            setTimeout(() => status.textContent = "Auto-Saved", 1500);
+        }
+
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (!saved) return;
+            try {
+                const data = JSON.parse(saved);
+                for (let key in data) {
+                    if (inputs[key]) {
+                        if (inputs[key].type === 'checkbox') {
+                            inputs[key].checked = data[key];
+                        } else {
+                            inputs[key].value = data[key];
+                        }
+                    }
+                }
+                applyAllInputs();
+            } catch (e) {
+                console.error("Gagal memuat data lokal:", e);
+            }
+        }
+
+        function resetToDefault() {
+            localStorage.removeItem(STORAGE_KEY);
+            location.reload();
+        }
+
+        // Kosongkan field dengan tombol ✕
+        function clearField(inputId, previewId, defaultText) {
+            const input = document.getElementById(inputId);
+            input.value = '';
+            input.dispatchEvent(new Event('input'));
+            saveToLocalStorage();
+        }
+
+        // Update Teks Preview secara Real-Time
+        function applyAllInputs() {
+            previews.streamer.textContent = inputs.streamer.value || 'Streamer';
+            previews.marquee.textContent = inputs.marquee.value;
+            previews.song.textContent = inputs.song.value;
+            previews.artist.textContent = inputs.artist.value;
+            previews.goalTitle.textContent = inputs.goalTitle.value;
+            
+            const val = inputs.goalPercent.value;
             document.getElementById('goal-val-label').textContent = val + '%';
             previews.goalPercentText.textContent = val + '%';
             previews.goalBar.style.width = val + '%';
-        });
 
-        // Toggle Widgets
-        inputs.toggleClock.addEventListener('change', (e) => {
-            previews.clockBox.style.display = e.target.checked ? 'block' : 'none';
-        });
-        inputs.toggleSocial.addEventListener('change', (e) => {
-            previews.socialBox.style.display = e.target.checked ? 'flex' : 'none';
-        });
+            // Visibility Toggles
+            previews.clockBox.style.display = inputs.toggleClock.checked ? 'block' : 'none';
+            previews.socialBox.style.display = inputs.toggleSocial.checked ? 'flex' : 'none';
+            previews.musicBox.style.display = inputs.toggleMusic.checked ? 'flex' : 'none';
+            previews.goalBox.style.display = inputs.toggleGoal.checked ? 'block' : 'none';
+            previews.marqueeBox.style.display = inputs.marquee.value.trim() ? 'block' : 'none';
+            previews.streamerBox.style.display = inputs.streamer.value.trim() ? 'flex' : 'none';
 
-        // Font Switching
-        inputs.selectFont.addEventListener('change', (e) => {
-            previews.wrapper.className = `absolute inset-0 z-10 p-5 flex flex-col justify-between pointer-events-none text-white ${e.target.value}`;
-        });
+            // Font & Glow
+            previews.wrapper.className = `absolute inset-0 z-10 p-5 flex flex-col justify-between pointer-events-none text-white ${inputs.selectFont.value}`;
+            previews.container.className = `relative w-full aspect-video rounded-xl overflow-hidden border border-slate-700/60 ${inputs.selectGlow.value}`;
+        }
 
-        // Social Rotator Logic
+        // Listeners untuk auto-save & update
+        for (let key in inputs) {
+            inputs[key].addEventListener('input', () => {
+                applyAllInputs();
+                saveToLocalStorage();
+            });
+            inputs[key].addEventListener('change', () => {
+                applyAllInputs();
+                saveToLocalStorage();
+            });
+        }
+
+        // --- Social Rotator ---
         const socialPlatforms = [
             { name: 'YouTube', valKey: 'yt', svg: '<path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>' },
             { name: 'Instagram', valKey: 'ig', svg: '<path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>' },
@@ -370,7 +513,7 @@
             previews.socialText.textContent = inputs[p.valKey].value || `@${p.name}`;
         }, 3000);
 
-        // Real-time Clock
+        // --- Real-time Clock ---
         setInterval(() => {
             const now = new Date();
             const hours = String(now.getHours()).padStart(2, '0');
@@ -379,7 +522,7 @@
             previews.clock.textContent = `${hours}:${minutes}:${seconds}`;
         }, 1000);
 
-        // --- 3. Canvas Animation Engine ---
+        // --- Canvas Animation Engine ---
         const canvas = document.getElementById('preview-canvas');
         const ctx = canvas.getContext('2d');
 
@@ -390,8 +533,7 @@
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
-        // Stardust Particles Setup
-        let particles = Array.from({ length: 50 }, () => ({
+        let particles = Array.from({ length: 60 }, () => ({
             x: Math.random() * canvas.width,
             y: Math.random() * canvas.height,
             radius: Math.random() * 1.5 + 0.5,
@@ -399,7 +541,6 @@
             alpha: Math.random()
         }));
 
-        // Matrix Rain Setup
         const matrixChars = "01ABCDEFXYZ";
         const fontSize = 14;
         let drops = [];
@@ -409,19 +550,17 @@
         }
         initMatrix();
 
-        // Neon Grid Offset
         let gridOffset = 0;
+        let pulseAngle = 0;
 
         function animateCanvas() {
             const fxType = inputs.selectBgFx.value;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Background Dasar Gelap Transparan
             ctx.fillStyle = "rgba(5, 5, 15, 0.9)";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             if (fxType === 'stardust') {
-                ctx.fillStyle = "rgba(236, 72, 153, 0.8)";
                 particles.forEach(p => {
                     p.y -= p.speedY;
                     if (p.y < 0) p.y = canvas.height;
@@ -431,36 +570,33 @@
                     ctx.fill();
                 });
             } else if (fxType === 'matrix') {
-                ctx.fillStyle = "rgba(59, 130, 246, 0.15)";
+                ctx.fillStyle = "rgba(59, 130, 246, 0.18)";
                 ctx.font = `${fontSize}px monospace`;
                 drops.forEach((y, i) => {
                     const char = matrixChars[Math.floor(Math.random() * matrixChars.length)];
                     const x = i * fontSize;
                     ctx.fillText(char, x, y);
-                    if (y > canvas.height && Math.random() > 0.975) {
-                        drops[i] = 0;
-                    }
+                    if (y > canvas.height && Math.random() > 0.975) drops[i] = 0;
                     drops[i] += fontSize;
                 });
             } else if (fxType === 'neongrid') {
-                gridOffset = (gridOffset + 0.5) % 30;
+                gridOffset = (gridOffset + 0.6) % 30;
                 ctx.strokeStyle = "rgba(236, 72, 153, 0.15)";
                 ctx.lineWidth = 1;
-                
-                // Garis Vertikal
                 for (let x = 0; x < canvas.width; x += 30) {
-                    ctx.beginPath();
-                    ctx.moveTo(x, 0);
-                    ctx.lineTo(x, canvas.height);
-                    ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
                 }
-                // Garis Horizontal bergerak
                 for (let y = gridOffset; y < canvas.height; y += 30) {
-                    ctx.beginPath();
-                    ctx.moveTo(0, y);
-                    ctx.lineTo(canvas.width, y);
-                    ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
                 }
+            } else if (fxType === 'cyberpulse') {
+                pulseAngle += 0.03;
+                const radius = 80 + Math.sin(pulseAngle) * 20;
+                ctx.beginPath();
+                ctx.arc(canvas.width / 2, canvas.height / 2, radius, 0, Math.PI * 2);
+                ctx.strokeStyle = "rgba(236, 72, 153, 0.25)";
+                ctx.lineWidth = 2;
+                ctx.stroke();
             }
 
             requestAnimationFrame(animateCanvas);
@@ -471,22 +607,60 @@
             if (inputs.selectBgFx.value === 'matrix') initMatrix();
         });
 
-        // --- 4. URL & Clipboard ---
-        function generateUrl() {
-            const params = new URLSearchParams({
-                streamer: inputs.streamer.value,
-                yt: inputs.yt.value,
-                ig: inputs.ig.value,
-                tt: inputs.tt.value,
-                marquee: inputs.marquee.value,
-                song: inputs.song.value,
-                artist: inputs.artist.value,
-                goalTitle: inputs.goalTitle.value,
-                goalPercent: inputs.goalPercent.value,
-                font: inputs.selectFont.value,
-                fx: inputs.selectBgFx.value
-            });
+        // --- Alert Test Simulator & Web Audio ---
+        function triggerAlert(type) {
+            const popup = document.getElementById('alert-popup');
+            const title = document.getElementById('alert-title');
+            const desc = document.getElementById('alert-desc');
 
+            if (type === 'follower') {
+                title.textContent = "New Follower Alert!";
+                desc.textContent = "@CyberFan_99 baru saja mem-follow channel!";
+            } else {
+                title.textContent = "Donasi Masuk! ($50)";
+                desc.textContent = "@SultanGaming: 'Semangat terus streamingnya bang!'";
+            }
+
+            popup.classList.remove('opacity-0', 'scale-95');
+            popup.classList.add('opacity-100', 'scale-100');
+
+            // Play Web Audio Sound
+            const soundType = document.getElementById('select-alert-sound').value;
+            if (soundType !== 'none') {
+                try {
+                    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = soundType === 'synth' ? 'sine' : 'sawtooth';
+                    osc.frequency.setValueAtTime(soundType === 'synth' ? 587.33 : 880, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.3);
+                    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.5);
+                } catch (e) {
+                    console.log("Audio Context diblokir browser sebelum interaksi user.");
+                }
+            }
+
+            setTimeout(() => {
+                popup.classList.remove('opacity-100', 'scale-100');
+                popup.classList.add('opacity-0', 'scale-95');
+            }, 3500);
+        }
+
+        // --- URL & Clipboard ---
+        function generateUrl() {
+            const params = new URLSearchParams();
+            for (let key in inputs) {
+                if (inputs[key].type === 'checkbox') {
+                    params.append(key, inputs[key].checked);
+                } else {
+                    params.append(key, inputs[key].value);
+                }
+            }
             const dummyUrl = window.location.origin + window.location.pathname + "?" + params.toString();
             document.getElementById('output-url-box').value = dummyUrl;
             document.getElementById('output-container').classList.remove('hidden');
@@ -506,6 +680,11 @@
                 btn.classList.remove('bg-pink-600', 'text-white');
             }, 2000);
         }
+
+        // Inisialisasi awal load data lokal
+        window.addEventListener('DOMContentLoaded', () => {
+            loadFromLocalStorage();
+        });
     </script>
 </body>
 </html>
